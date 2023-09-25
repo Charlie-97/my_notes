@@ -1,6 +1,6 @@
 # my_notes
 
-A new Flutter project.
+An application that stores user's personal notes remotely. Allows user's to login, create notes, view notes, edit notes and delete notes.
 
 ## Getting Started
 
