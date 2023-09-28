@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_notes/widgets/widgets.dart';
+import 'package:my_notes/widgets/my_drawer.dart';
+import 'package:my_notes/widgets/snackbar_messages.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,25 +25,34 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Home Page'),
       ),
-      drawer: const MyDrawer(),
+      drawer: MyDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'Notes will be displayed here.',
             ),
             Text(
-              '$_counter',
+              'You have $_counter notes. Tap Add Notes to create new',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          _incrementCounter;
+          final snackBarHelper = SnackBarHelper();
+          final snackBar = snackBarHelper.getSnackBar(
+            context,
+            'Note added Successfully!',
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        },
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Add Note'),
       ),
     );
   }

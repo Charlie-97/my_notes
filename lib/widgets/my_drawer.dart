@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/utils/functions.dart';
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({super.key});
+  MyDrawer({super.key});
+
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +47,7 @@ class MyDrawer extends StatelessWidget {
             alignment: Alignment.bottomRight,
             child: TextButton.icon(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/login');
+                _authService.signOutUser(context);
               },
               icon: const Icon(Icons.key),
               label: const Text('Log Out'),

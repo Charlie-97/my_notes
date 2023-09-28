@@ -4,6 +4,7 @@
     "project_id": "my-notes-a7104",
     "storage_bucket": "my-notes-a7104.appspot.com"
   },
+  
   "client": [
     {
       "client_info": {
@@ -21,6 +22,15 @@
             "certificate_hash": "a632bb0166b9c02d6c65520a71420f89b3a1238d"
           }
         },
+        {
+          "installed":{
+              "client_id":"150563598892-rvlcb9apog3qofhf5coeuuk9l34j1c4n.apps.googleusercontent.com", 
+              "project_id":"my-notes-400120", 
+              "auth_uri":"https://accounts.google.com/o/oauth2/auth",
+              "token_uri":"https://oauth2.googleapis.com/token",
+              "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs"
+          }
+      },
         {
           "client_id": "587231250742-5oqjn40efgj3hagqnt6kti73kctpap5j.apps.googleusercontent.com",
           "client_type": 3
