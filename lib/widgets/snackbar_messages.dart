@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
 
-class SnackBarHelper {
-  static final SnackBarHelper _instance = SnackBarHelper._internal();
+class MySnackBar {
+  final String message;
 
-  factory SnackBarHelper() {
-    return _instance;
-  }
+  MySnackBar(this.message);
 
-  SnackBarHelper._internal();
+  SnackBar build() {
+    final colorScheme =
+        ThemeData().colorScheme; // Replace with your app's theme
 
-  SnackBar getSnackBar(BuildContext context, String message) {
-    final snackBar = SnackBar(
-      content: Center(
-        child: Text(
-          message,
-          style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimaryContainer),
+    return SnackBar(
+      backgroundColor: colorScheme.primary, // Background color
+      content: Text(
+        message,
+        style: TextStyle(
+          color: colorScheme.onPrimary, // Text color
         ),
       ),
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      duration: const Duration(seconds: 2),
     );
-    return snackBar;
   }
 }

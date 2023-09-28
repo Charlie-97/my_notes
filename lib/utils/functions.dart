@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:my_notes/utils/navigator_key.dart';
 import 'package:my_notes/widgets/snackbar_messages.dart';
 
 Function setPasswordVisibility({required bool obscureText}) {
@@ -34,8 +35,6 @@ bool validateEmail({required String email}) {
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  final snackBarHelper = SnackBarHelper();
-
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<void> signInWithGoogle(BuildContext context) async {
@@ -57,47 +56,58 @@ class AuthService {
       await _auth.signInWithCredential(credential);
 
       // Sign-in with Google successful, show a success SnackBar
-      
-      final snackBar = snackBarHelper.getSnackBar(
-        context,
+
+      final snackBar = MySnackBar(
         'Signed in Successfully as ${googleUser.email}!',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
+      ).build();
+      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .showSnackBar(snackBar);
+      Navigator.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .pushReplacementNamed('/home');
+    } on FirebaseAuthException catch (e) {
       // Sign-in with Google failed, show an error SnackBar
-      
-      final snackBar = snackBarHelper.getSnackBar(
-        context,
+
+      final snackBar = MySnackBar(
         'Error signing in with Google: $e',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      ).build();
+      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .showSnackBar(snackBar);
 
       print('Error signing in with Google: $e');
     }
   }
 
   Future<void> signUpWithEmailAndPassword(
-      BuildContext context, String email, String password) async {
+      String email, String password, String confirmPassword) async {
+    final userPassword = password;
+    final userConfirmPassword = confirmPassword;
+
     try {
       await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      final snackBar = snackBarHelper.getSnackBar(
-        context,
-        'Sign-up successful!',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      Navigator.pushReplacementNamed(context, '/login');
-    } catch (e) {
-      final snackBar = snackBarHelper.getSnackBar(
-        context,
-        'Error signing up: ${e.toString().substring(37)}',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      print('Error signing up: ${e.toString().substring(37)}');
+      final snackBar = MySnackBar('Sign-up successful').build();
+      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .showSnackBar(snackBar);
+
+      Navigator.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .pushReplacementNamed('/login');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        final snackBar =
+            MySnackBar('Error signing up: Email already in use').build();
+        ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+            .showSnackBar(snackBar);
+      } else if (e.code == 'weak-password') {
+        final snackBar =
+            MySnackBar('Error signing up: Enter a stronger password').build();
+        ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+            .showSnackBar(snackBar);
+      } else if (userPassword != userConfirmPassword) {
+        throw Exception(e);
+      }
     }
   }
 
@@ -109,18 +119,19 @@ class AuthService {
         password: password,
       );
       User? user = userCredential.user;
-      final snackBar = snackBarHelper.getSnackBar(
-        context,
+      final snackBar = MySnackBar(
         'Signed successfully as ${user?.email}!',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      Navigator.pushReplacementNamed(context, '/home');
+      ).build();
+      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .showSnackBar(snackBar);
+      Navigator.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .pushReplacementNamed('/home');
     } catch (e) {
-      final snackBar = snackBarHelper.getSnackBar(
-        context,
+      final snackBar = MySnackBar(
         'Error signing in: ${e.toString().substring(42)}',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      ).build();
+      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .showSnackBar(snackBar);
       print('Error signing in: $e');
     }
   }
@@ -128,12 +139,13 @@ class AuthService {
   Future<void> signOutUser(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      final snackBar = snackBarHelper.getSnackBar(
-        context,
+      final snackBar = MySnackBar(
         'Logged out Successfully!',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      Navigator.pushReplacementNamed(context, '/login');
+      ).build();
+      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .showSnackBar(snackBar);
+      Navigator.of(RootNavigatorKey.navigatorKey.currentContext!)
+          .pushReplacementNamed('/login');
     } catch (e) {
       print("Error signing out: $e");
     }

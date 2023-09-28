@@ -178,9 +178,11 @@ class _SignupPageState extends State<SignupPage> {
                     onPressed: () async {
                       final userEmail = _userEmail.text;
                       final userPassword = _userPassword.text;
+                      final userConfirmPassword =
+                          _userPasswordConfirmation.text;
 
                       await _authService.signUpWithEmailAndPassword(
-                          context, userEmail, userPassword);
+                          userEmail, userPassword, userConfirmPassword);
                     },
                     child: const Text('Signup'),
                   ),
