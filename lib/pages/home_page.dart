@@ -43,11 +43,10 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _incrementCounter;
-          final snackBarHelper = SnackBarHelper();
-          final snackBar = snackBarHelper.getSnackBar(
-            context,
+          
+          final snackBar = MySnackBar(
             'Note added Successfully!',
-          );
+          ).build();
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         },
         tooltip: 'Increment',
