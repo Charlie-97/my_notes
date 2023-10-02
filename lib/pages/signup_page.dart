@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/pages/login_page.dart';
+import 'package:my_notes/router/base_navigator.dart';
 import 'package:my_notes/utils/functions.dart';
 import 'package:my_notes/widgets/google_button.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
+  static const routeName = 'signup_page';
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -52,6 +55,14 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(
+              Icons.chevron_left,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 24.0,
+            ),
+            onPressed: () => BaseNavigator.pop(),
+          ),
           title: Text(
             'SignUp Page',
             style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
@@ -183,27 +194,50 @@ class _SignupPageState extends State<SignupPage> {
 
                       await _authService.signUpWithEmailAndPassword(
                           userEmail, userPassword, userConfirmPassword);
+
+                      BaseNavigator.pushNamedAndclear(LoginPage.routeName);
                     },
                     child: const Text('Signup'),
                   ),
                   const SizedBox(
                     height: 12,
                   ),
-                  const Text(
-                    'OR',
-                    style: TextStyle(fontSize: 10.0),
-                  ),
-                  Divider(
-                    height: 15.0,
-                    thickness: 2.0,
-                    color: Theme.of(context).colorScheme.primary,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          height: 15.0,
+                          thickness: 2.0,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Text(
+                        'OR',
+                        style: TextStyle(
+                            fontSize: 12.0,
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Expanded(
+                        child: Divider(
+                          height: 15.0,
+                          thickness: 2.0,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 12,
                   ),
                   GoogleButton(),
                   const SizedBox(
-                    height: 40.0,
+                    height: 24.0,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -214,7 +248,8 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       GestureDetector(
                           onTap: () {
-                            Navigator.pushReplacementNamed(context, '/login');
+                            BaseNavigator.pushNamedAndclear(
+                                LoginPage.routeName);
                           },
                           child: Text(
                             "Login Here",

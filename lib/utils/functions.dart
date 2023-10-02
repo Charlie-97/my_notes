@@ -3,6 +3,9 @@ import 'dart:core';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:my_notes/pages/home_page.dart';
+import 'package:my_notes/pages/login_page.dart';
+import 'package:my_notes/router/base_navigator.dart';
 import 'package:my_notes/utils/navigator_key.dart';
 import 'package:my_notes/widgets/snackbar_messages.dart';
 
@@ -60,17 +63,16 @@ class AuthService {
       final snackBar = MySnackBar(
         'Signed in Successfully as ${googleUser.email}!',
       ).build();
-      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
           .showSnackBar(snackBar);
-      Navigator.of(RootNavigatorKey.navigatorKey.currentContext!)
-          .pushReplacementNamed('/home');
+      BaseNavigator.pushNamedAndclear(HomePage.routeName);
     } on FirebaseAuthException catch (e) {
       // Sign-in with Google failed, show an error SnackBar
 
       final snackBar = MySnackBar(
         'Error signing in with Google: $e',
       ).build();
-      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
           .showSnackBar(snackBar);
 
       print('Error signing in with Google: $e');
@@ -81,29 +83,33 @@ class AuthService {
       String email, String password, String confirmPassword) async {
     final userPassword = password;
     final userConfirmPassword = confirmPassword;
+    final userEmail = email;
 
     try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      final snackBar = MySnackBar('Sign-up successful').build();
-      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
-          .showSnackBar(snackBar);
-
-      Navigator.of(RootNavigatorKey.navigatorKey.currentContext!)
-          .pushReplacementNamed('/login');
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+          email: userEmail, password: userPassword);
+      User? user = userCredential.user;
+      final snackBarSuccessful = MySnackBar('Sign-up successful').build();
+      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+          .showSnackBar(snackBarSuccessful);
+      await user?.sendEmailVerification();
+      // await Future.delayed(const Duration(seconds: 3));
+      final snackBarVerify = MySnackBar(
+              'Please verify your email to continue. A link has been sent to your email address!')
+          .build();
+      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+          .showSnackBar(snackBarVerify);
+      BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         final snackBar =
             MySnackBar('Error signing up: Email already in use').build();
-        ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
             .showSnackBar(snackBar);
       } else if (e.code == 'weak-password') {
         final snackBar =
             MySnackBar('Error signing up: Enter a stronger password').build();
-        ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
             .showSnackBar(snackBar);
       } else if (userPassword != userConfirmPassword) {
         throw Exception(e);
@@ -119,18 +125,25 @@ class AuthService {
         password: password,
       );
       User? user = userCredential.user;
-      final snackBar = MySnackBar(
-        'Signed successfully as ${user?.email}!',
-      ).build();
-      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
-          .showSnackBar(snackBar);
-      Navigator.of(RootNavigatorKey.navigatorKey.currentContext!)
-          .pushReplacementNamed('/home');
+      if (user?.emailVerified ?? false) {
+        final snackBar = MySnackBar(
+          'Signed successfully as ${user?.email}!',
+        ).build();
+        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+            .showSnackBar(snackBar);
+        BaseNavigator.pushNamedAndReplace(HomePage.routeName);
+      } else {
+        final snackBar = MySnackBar(
+          'Please verify your email to continue. A link has been sent to your email address!',
+        ).build();
+        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+            .showSnackBar(snackBar);
+      }
     } catch (e) {
       final snackBar = MySnackBar(
         'Error signing in: ${e.toString().substring(42)}',
       ).build();
-      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
           .showSnackBar(snackBar);
       print('Error signing in: $e');
     }
@@ -144,8 +157,7 @@ class AuthService {
       ).build();
       ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
           .showSnackBar(snackBar);
-      Navigator.of(RootNavigatorKey.navigatorKey.currentContext!)
-          .pushReplacementNamed('/login');
+      BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
     } catch (e) {
       print("Error signing out: $e");
     }

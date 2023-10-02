@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/pages/signup_page.dart';
+import 'package:my_notes/router/base_navigator.dart';
 import 'package:my_notes/utils/functions.dart';
+import 'package:my_notes/widgets/google_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+  static const routeName = 'login_page';
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -45,11 +49,12 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 0.0,
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 100.0),
+        padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 0.0),
         child: Center(
           child: SingleChildScrollView(
             child: Column(
               children: [
+                // SizedBox(height: 100.0),
                 TextFormField(
                   focusNode: _emailFocus,
                   onEditingComplete: () {
@@ -124,6 +129,43 @@ class _LoginPageState extends State<LoginPage> {
                   height: 12,
                 ),
                 Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        height: 15.0,
+                        thickness: 2.0,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Text(
+                      'OR',
+                      style: TextStyle(
+                          fontSize: 12.0,
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Expanded(
+                      child: Divider(
+                        height: 15.0,
+                        thickness: 2.0,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                GoogleButton(),
+                const SizedBox(
+                  height: 24.0,
+                ),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Don't have an account?"),
@@ -131,15 +173,18 @@ class _LoginPageState extends State<LoginPage> {
                       width: 5.0,
                     ),
                     GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacementNamed(context, '/');
-                        },
-                        child: Text(
-                          "Sign up Here",
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor),
-                        )),
+                      onTap: () {
+                        BaseNavigator.pushNamed(SignupPage.routeName);
+                      },
+                      child: Text(
+                        "Sign up Here",
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                    ),
                   ],
+                ),
+                const SizedBox(
+                  height: 60.0,
                 )
               ],
             ),
