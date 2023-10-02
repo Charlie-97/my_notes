@@ -1,11 +1,12 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:my_notes/pages/login_page.dart';
+import 'package:my_notes/router/base_navigator.dart';
 import 'package:my_notes/utils/functions.dart';
-import 'package:my_notes/firebase_options.dart';
+import 'package:my_notes/widgets/google_button.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
+  static const routeName = 'signup_page';
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -22,10 +23,16 @@ class _SignupPageState extends State<SignupPage> {
 
   bool obscurePasswordConfirmation = true;
 
-  Icon passwordVisibilityIcon = Icon(Icons.visibility);
-  Icon confirmPasswordVisibilityIcon = Icon(Icons.visibility);
+  Icon passwordVisibilityIcon = const Icon(Icons.visibility);
+  Icon confirmPasswordVisibilityIcon = const Icon(Icons.visibility);
 
   bool passwordsMatch = true;
+
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _confirmPasswordFocus = FocusNode();
+
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -46,166 +53,215 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SignUp Page'),
-        backgroundColor: Theme.of(context).primaryColorLight,
-        centerTitle: true,
-        elevation: 0.0,
-      ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(
+              Icons.chevron_left,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 24.0,
+            ),
+            onPressed: () => BaseNavigator.pop(),
+          ),
+          title: Text(
+            'SignUp Page',
+            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          centerTitle: true,
+          elevation: 0.0,
         ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextFormField(
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        keyboardType: TextInputType.emailAddress,
-                        controller: _userEmail,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'example@whatevermail.com',
-                          prefixIcon: Icon(Icons.mail),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 12.0,
-                      ),
-                      TextFormField(
-                        obscureText: obscurePassword,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        controller: _userPassword,
-                        onChanged: (_) {
-                          setState(() {});
+        body: Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 100.0),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextFormField(
+                    focusNode: _emailFocus,
+                    onEditingComplete: () {
+                      _passwordFocus.requestFocus();
+                    },
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    keyboardType: TextInputType.emailAddress,
+                    controller: _userEmail,
+                    onChanged: (_) {
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'example@whatevermail.com',
+                      prefixIcon: const Icon(Icons.mail),
+                      prefixIconColor:
+                          Theme.of(context).colorScheme.onBackground,
+                      errorText: validateEmail(email: _userEmail.text)
+                          ? null
+                          : 'Enter a valid email',
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 12.0,
+                  ),
+                  TextFormField(
+                    focusNode: _passwordFocus,
+                    onEditingComplete: () {
+                      _confirmPasswordFocus.requestFocus();
+                    },
+                    obscureText: obscurePassword,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    controller: _userPassword,
+                    onChanged: (_) {
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      errorText: checkPasswordLength(_userPassword.text)
+                          ? null
+                          : 'Password must be at least 8 characters',
+                      labelText: 'Password',
+                      hintText: 'min. 8 characters',
+                      prefixIcon: const Icon(Icons.lock),
+                      prefixIconColor:
+                          Theme.of(context).colorScheme.onBackground,
+                      suffixIconColor:
+                          Theme.of(context).colorScheme.onBackground,
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            final toggleVisibility = setPasswordVisibility(
+                                obscureText: obscurePassword);
+                            obscurePassword = !obscurePassword;
+                            final newIconData = toggleVisibility();
+                            passwordVisibilityIcon = Icon(newIconData);
+                          });
                         },
-                        decoration: InputDecoration(
-                          errorText: checkPasswordLength(_userPassword.text)
-                              ? null
-                              : 'Password must be at least 8 characters',
-                          labelText: 'Password',
-                          hintText: 'min. 8 characters',
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                final toggleVisibility = setPasswordVisibility(
-                                    obscureText: obscurePassword);
-                                obscurePassword = !obscurePassword;
-                                final newIconData = toggleVisibility();
-                                passwordVisibilityIcon = Icon(newIconData);
-                              });
-                            },
-                            icon: passwordVisibilityIcon,
-                          ),
-                        ),
+                        icon: passwordVisibilityIcon,
                       ),
-                      const SizedBox(
-                        height: 12.0,
-                      ),
-                      TextFormField(
-                        obscureText: obscurePasswordConfirmation,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        controller: _userPasswordConfirmation,
-                        onChanged: (_) {
-                          setState(() {});
-                        },
-                        decoration: InputDecoration(
-                          errorText: checkPasswordsMatch(
-                            password: _userPassword.text,
-                            passwordConfirmation:
-                                _userPasswordConfirmation.text,
-                          )
-                              ? null
-                              : '! Password Mismatch',
-                          labelText: 'Confirm Password',
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                final toggleConfirmVisibility =
-                                    setPasswordVisibility(
-                                        obscureText:
-                                            obscurePasswordConfirmation);
-                                obscurePasswordConfirmation =
-                                    !obscurePasswordConfirmation;
-                                final newIconData = toggleConfirmVisibility();
-                                confirmPasswordVisibilityIcon =
-                                    Icon(newIconData);
-                              });
-                            },
-                            icon: confirmPasswordVisibilityIcon,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 12.0,
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final userEmail = _userEmail.text;
-                          final userPassword = _userPassword.text;
-
-                          final userCredential = await FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                            email: userEmail,
-                            password: userPassword,
-                          );
-                          print(userCredential);
-                          // Navigator.pushReplacementNamed(context, '/home');
-                        },
-                        child: const Text('Signup'),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      Divider(
-                        height: 15.0,
-                        thickness: 2.0,
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('Already have an account?'),
-                          const SizedBox(
-                            width: 5.0,
-                          ),
-                          GestureDetector(
-                              onTap: () {
-                                Navigator.pushReplacementNamed(
-                                    context, '/login');
-                              },
-                              child: Text(
-                                "Login Here",
-                                style: TextStyle(
-                                    color: Theme.of(context).primaryColor),
-                              )),
-                        ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 12.0,
+                  ),
+                  TextFormField(
+                    focusNode: _confirmPasswordFocus,
+                    obscureText: obscurePasswordConfirmation,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    controller: _userPasswordConfirmation,
+                    onChanged: (_) {
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      errorText: checkPasswordsMatch(
+                        password: _userPassword.text,
+                        passwordConfirmation: _userPasswordConfirmation.text,
                       )
+                          ? null
+                          : '! Password Mismatch',
+                      labelText: 'Confirm Password',
+                      prefixIcon: const Icon(Icons.lock),
+                      prefixIconColor:
+                          Theme.of(context).colorScheme.onBackground,
+                      suffixIconColor:
+                          Theme.of(context).colorScheme.onBackground,
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            final toggleConfirmVisibility =
+                                setPasswordVisibility(
+                                    obscureText: obscurePasswordConfirmation);
+                            obscurePasswordConfirmation =
+                                !obscurePasswordConfirmation;
+                            final newIconData = toggleConfirmVisibility();
+                            confirmPasswordVisibilityIcon = Icon(newIconData);
+                          });
+                        },
+                        icon: confirmPasswordVisibilityIcon,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 12.0,
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final userEmail = _userEmail.text;
+                      final userPassword = _userPassword.text;
+                      final userConfirmPassword =
+                          _userPasswordConfirmation.text;
+
+                      await _authService.signUpWithEmailAndPassword(
+                          userEmail, userPassword, userConfirmPassword);
+
+                      BaseNavigator.pushNamedAndclear(LoginPage.routeName);
+                    },
+                    child: const Text('Signup'),
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          height: 15.0,
+                          thickness: 2.0,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Text(
+                        'OR',
+                        style: TextStyle(
+                            fontSize: 12.0,
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Expanded(
+                        child: Divider(
+                          height: 15.0,
+                          thickness: 2.0,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              );
-
-            case ConnectionState.waiting:
-              return const Text('data');
-
-
-            default:
-              return const Text('Loading...');
-          }
-        },
-      ),
-    );
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  GoogleButton(),
+                  const SizedBox(
+                    height: 24.0,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Already have an account?'),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      GestureDetector(
+                          onTap: () {
+                            BaseNavigator.pushNamedAndclear(
+                                LoginPage.routeName);
+                          },
+                          child: Text(
+                            "Login Here",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor),
+                          )),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 }

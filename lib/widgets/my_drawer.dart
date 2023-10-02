@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/pages/login_page.dart';
+import 'package:my_notes/router/base_navigator.dart';
+import 'package:my_notes/utils/functions.dart';
+import 'package:my_notes/widgets/snackbar_messages.dart';
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({super.key});
+  MyDrawer({super.key});
+
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +50,11 @@ class MyDrawer extends StatelessWidget {
             alignment: Alignment.bottomRight,
             child: TextButton.icon(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/login');
+                _authService.signOutUser(context);
+                final snackbar = MySnackBar('Sign out successful').build();
+                ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+                    .showSnackBar(snackbar);
+                BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
               },
               icon: const Icon(Icons.key),
               label: const Text('Log Out'),

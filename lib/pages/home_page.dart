@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:my_notes/widgets/widgets.dart';
+import 'package:my_notes/firebase_options.dart';
+import 'package:my_notes/widgets/my_drawer.dart';
+import 'package:my_notes/widgets/snackbar_messages.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
+  static const routeName = 'home_page';
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -24,25 +28,52 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Home Page'),
       ),
-      drawer: const MyDrawer(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+      drawer: MyDrawer(),
+      body: FutureBuilder(
+          future: Firebase.initializeApp(
+            options: DefaultFirebaseOptions.currentPlatform,
+          ),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                final user = FirebaseAuth.instance.currentUser;
+
+                if (user?.emailVerified ?? false) {
+                  print('email verified');
+                } else {
+                  print('Verify email to get full access');
+                }
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      const Text(
+                        'Notes will be displayed here.',
+                      ),
+                      Text(
+                        'You have $_counter notes. Tap Add Notes to create new',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
+                );
+
+              default:
+                return const Text('data');
+            }
+          }),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          _incrementCounter;
+
+          final snackBar = MySnackBar(
+            'Note added Successfully!',
+          ).build();
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        },
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Add Note'),
       ),
     );
   }
