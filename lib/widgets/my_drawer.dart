@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:my_notes/pages/login_page.dart';
 import 'package:my_notes/router/base_navigator.dart';
 import 'package:my_notes/utils/functions.dart';
+import 'package:my_notes/widgets/dialogue_boxes.dart';
 import 'package:my_notes/widgets/snackbar_messages.dart';
+import 'dart:developer' as devtools show log;
 
 class MyDrawer extends StatelessWidget {
   MyDrawer({super.key});
 
+  final AppOverlays _appOverlays = AppOverlays();
   final AuthService _authService = AuthService();
 
   @override
@@ -36,10 +39,16 @@ class MyDrawer extends StatelessWidget {
                 child: Column(
                   children: [
                     ListTile(
-                      title: Text('data'),
+                      title: Text('Profile'),
                     ),
                     ListTile(
-                      title: Text('data'),
+                      title: Text('Starred Notes'),
+                    ),
+                    Divider(
+                      thickness: 1.0,
+                    ),
+                    ListTile(
+                      title: Text('Settings'),
                     ),
                   ],
                 ),
@@ -47,16 +56,23 @@ class MyDrawer extends StatelessWidget {
             ),
           ),
           Container(
-            alignment: Alignment.bottomRight,
+            alignment: Alignment.bottomCenter,
             child: TextButton.icon(
-              onPressed: () {
-                _authService.signOutUser(context);
-                final snackbar = MySnackBar('Sign out successful').build();
-                ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-                    .showSnackBar(snackbar);
-                BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
+              onPressed: () async {
+                final shouldLogout =
+                    await _appOverlays.showLogOutDialog(context);
+                devtools.log(shouldLogout.toString());
+                if (shouldLogout) {
+                  await _authService
+                      .signOutUser(BaseNavigator.key.currentContext!);
+                  BaseNavigator.pushNamedAndclear(LoginPage.routeName);
+                  final snackbar = MySnackBar('Sign out successful').build();
+                  ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+                      .showSnackBar(snackbar);
+                  BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
+                }
               },
-              icon: const Icon(Icons.key),
+              icon: const Icon(Icons.logout),
               label: const Text('Log Out'),
             ),
           )

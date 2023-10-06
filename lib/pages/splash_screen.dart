@@ -4,6 +4,7 @@ import 'package:my_notes/pages/home_page.dart';
 import 'package:my_notes/pages/login_page.dart';
 import 'package:my_notes/router/base_navigator.dart';
 import 'package:my_notes/widgets/snackbar_messages.dart';
+import 'package:animate_do/animate_do.dart';
 
 class SplashScreen extends StatefulWidget {
   static const routeName = "splash";
@@ -52,12 +53,43 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
         child: Center(
-          child: Text(
-            'SPLASH SCREEN',
-            style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onPrimary),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FadeInDown(
+                duration: const Duration(seconds: 1),
+                child: Icon(
+                  Icons.edit_note_sharp,
+                  size: 100.0,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+              // Future.delayed(Duration(seconds:1),),
+              const SizedBox(height: 12.0),
+              FadeInLeft(
+                duration: const Duration(seconds: 1),
+                child: Text(
+                  'MY NOTES',
+                  style: TextStyle(
+                      fontSize: 35.0,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onPrimary),
+                ),
+              ),
+              const SizedBox(height: 24.0),
+              FadeInRight(
+                duration: const Duration(seconds: 2),
+                child: Text(
+                  'Your favourite notepad...',
+                  style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w200,
+                      fontStyle: FontStyle.italic,
+                      color: Theme.of(context).colorScheme.onPrimary),
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:my_notes/pages/login_page.dart';
 import 'package:my_notes/router/base_navigator.dart';
 import 'package:my_notes/utils/functions.dart';
 import 'package:my_notes/widgets/google_button.dart';
+import 'dart:developer' as devtools show log;
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -19,6 +20,10 @@ class _SignupPageState extends State<SignupPage> {
 
   late final TextEditingController _userPasswordConfirmation;
 
+  late final TextEditingController _userName;
+
+  bool loadingVisibility = false;
+
   bool obscurePassword = true;
 
   bool obscurePasswordConfirmation = true;
@@ -28,14 +33,17 @@ class _SignupPageState extends State<SignupPage> {
 
   bool passwordsMatch = true;
 
+  final FocusNode _nameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
 
   final AuthService _authService = AuthService();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
+    _userName = TextEditingController();
     _userEmail = TextEditingController();
     _userPassword = TextEditingController();
     _userPasswordConfirmation = TextEditingController();
@@ -44,6 +52,7 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   void dispose() {
+    _userName.dispose();
     _userEmail.dispose();
     _userPassword.dispose();
     _userPasswordConfirmation.dispose();
@@ -55,29 +64,77 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
+          title: Text(
+            'Signup',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+          ),
           leading: IconButton(
             icon: Icon(
               Icons.chevron_left,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onBackground,
               size: 24.0,
             ),
             onPressed: () => BaseNavigator.pop(),
           ),
-          title: Text(
-            'SignUp Page',
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          centerTitle: true,
-          elevation: 0.0,
+          // s
+          backgroundColor: Theme.of(context).colorScheme.background,
+          elevation: 0.5,
         ),
         body: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 100.0),
+          padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
           child: Center(
             child: SingleChildScrollView(
+              key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome to My Notes 😁!!!',
+                        style: Theme.of(context).textTheme.headlineLarge,
+                      ),
+                      const SizedBox(height: 12.0),
+                      Text(
+                        "Please fill in the form below and let's get started.",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30.0),
+                  TextFormField(
+                    focusNode: _nameFocus,
+                    onEditingComplete: () {
+                      _emailFocus.requestFocus();
+                    },
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    keyboardType: TextInputType.name,
+                    controller: _userName,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter your name';
+                      }
+                      return null;
+                    },
+                    onChanged: (_) {
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Name',
+                      hintText: 'John Doe',
+                      prefixIcon: const Icon(Icons.person),
+                      prefixIconColor:
+                          Theme.of(context).colorScheme.onBackground,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 12.0,
+                  ),
                   TextFormField(
                     focusNode: _emailFocus,
                     onEditingComplete: () {
@@ -87,6 +144,16 @@ class _SignupPageState extends State<SignupPage> {
                     autocorrect: false,
                     keyboardType: TextInputType.emailAddress,
                     controller: _userEmail,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Enter your email address';
+                      }
+                      if (!validateEmail(email: value)) {
+                        return 'Enter a valid email address';
+                      }
+                      return null;
+                    },
                     onChanged: (_) {
                       setState(() {});
                     },
@@ -96,9 +163,6 @@ class _SignupPageState extends State<SignupPage> {
                       prefixIcon: const Icon(Icons.mail),
                       prefixIconColor:
                           Theme.of(context).colorScheme.onBackground,
-                      errorText: validateEmail(email: _userEmail.text)
-                          ? null
-                          : 'Enter a valid email',
                     ),
                   ),
                   const SizedBox(
@@ -113,13 +177,12 @@ class _SignupPageState extends State<SignupPage> {
                     enableSuggestions: false,
                     autocorrect: false,
                     controller: _userPassword,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: validatePassword,
                     onChanged: (_) {
                       setState(() {});
                     },
                     decoration: InputDecoration(
-                      errorText: checkPasswordLength(_userPassword.text)
-                          ? null
-                          : 'Password must be at least 8 characters',
                       labelText: 'Password',
                       hintText: 'min. 8 characters',
                       prefixIcon: const Icon(Icons.lock),
@@ -185,20 +248,32 @@ class _SignupPageState extends State<SignupPage> {
                   const SizedBox(
                     height: 12.0,
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final userEmail = _userEmail.text;
-                      final userPassword = _userPassword.text;
-                      final userConfirmPassword =
-                          _userPasswordConfirmation.text;
+                  Stack(children: [
+                    ElevatedButton(
+                      style: const ButtonStyle(),
+                      onPressed: () async {
+                        devtools.log('Button Pressed');
+                        setState(() {
+                          loadingVisibility = true;
+                        });
 
-                      await _authService.signUpWithEmailAndPassword(
-                          userEmail, userPassword, userConfirmPassword);
+                        final userEmail = _userEmail.text.trim();
+                        final userPassword = _userPassword.text;
+                        final userConfirmPassword =
+                            _userPasswordConfirmation.text;
 
-                      BaseNavigator.pushNamedAndclear(LoginPage.routeName);
-                    },
-                    child: const Text('Signup'),
-                  ),
+                        await _authService.signUpWithEmailAndPassword(
+                            userEmail, userPassword, userConfirmPassword);
+                        setState(() {
+                          loadingVisibility = false;
+                        });
+                      },
+                      child: const Text('Signup'),
+                    ),
+                    Visibility(
+                        visible: loadingVisibility,
+                        child: const CircularProgressIndicator.adaptive()),
+                  ]),
                   const SizedBox(
                     height: 12,
                   ),
@@ -247,16 +322,19 @@ class _SignupPageState extends State<SignupPage> {
                         width: 5.0,
                       ),
                       GestureDetector(
-                          onTap: () {
-                            BaseNavigator.pushNamedAndclear(
-                                LoginPage.routeName);
-                          },
-                          child: Text(
-                            "Login Here",
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColor),
-                          )),
+                        onTap: () {
+                          BaseNavigator.pushNamedAndclear(LoginPage.routeName);
+                        },
+                        child: Text(
+                          "Login Here",
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
                     ],
+                  ),
+                  const SizedBox(
+                    height: 100.0,
                   )
                 ],
               ),

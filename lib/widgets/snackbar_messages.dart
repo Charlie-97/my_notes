@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/router/base_navigator.dart';
 
 class MySnackBar {
   final String message;
@@ -22,4 +23,9 @@ class MySnackBar {
       duration: const Duration(seconds: 3),
     );
   }
+}
+
+Future<void> showMySnackBar(SnackBar snackBar) async {
+  ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+      .showSnackBar(snackBar);
 }

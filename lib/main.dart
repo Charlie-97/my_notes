@@ -4,6 +4,8 @@ import 'package:my_notes/firebase_options.dart';
 import 'package:my_notes/pages/splash_screen.dart';
 import 'package:my_notes/router/app_router.dart';
 import 'package:my_notes/router/base_navigator.dart';
+import 'package:my_notes/utils/home_state.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,7 +14,24 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(
-    MaterialApp(
+    ChangeNotifierProvider(
+      create: (context) => HomeState(),
+      child: const MyNotesApp(),
+    ),
+  );
+}
+
+class MyNotesApp extends StatefulWidget {
+  const MyNotesApp({super.key});
+
+  @override
+  State<MyNotesApp> createState() => _MyNotesAppState();
+}
+
+class _MyNotesAppState extends State<MyNotesApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
       navigatorKey: BaseNavigator.key,
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -22,6 +41,6 @@ void main() async {
           textButtonTheme: const TextButtonThemeData(style: ButtonStyle())),
       onGenerateRoute: AppRouter.onGenerateRoute,
       initialRoute: SplashScreen.routeName,
-    ),
-  );
+    );
+  }
 }
