@@ -1,13 +1,11 @@
 import 'dart:core';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:my_notes/pages/home_page.dart';
-import 'package:my_notes/pages/login_page.dart';
+import 'package:my_notes/presentation/pages/login_page.dart';
+import 'package:my_notes/presentation/pages/my_notes.dart';
 import 'package:my_notes/router/base_navigator.dart';
-import 'package:my_notes/utils/navigator_key.dart';
-import 'package:my_notes/widgets/snackbar_messages.dart';
+import 'package:my_notes/services/auth/auth_exceptions.dart';
+import 'package:my_notes/services/auth/auth_service.dart';
+import 'package:my_notes/presentation/widgets/snackbar_messages.dart';
 
 Function setPasswordVisibility({required bool obscureText}) {
   return () {
@@ -23,143 +21,201 @@ bool checkPasswordsMatch({
   return password == passwordConfirmation || passwordConfirmation.isEmpty;
 }
 
-bool checkPasswordLength(String password) {
-  return password.length >= 8 || password.isEmpty;
+bool containsSpecialCharacter(String password) {
+  final List<String> usableSpecialCharacters = [
+    '#',
+    '@',
+    '\$',
+    '&',
+    '-',
+    '!',
+    '%',
+    '^'
+  ];
+
+  return usableSpecialCharacters.any((element) => password.contains(element));
+}
+
+bool containsUpperCase(String password) {
+  for (int i = 0; i < password.length; i++) {
+    if (password[i].toUpperCase() == password[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool containsLowerCase(String password) {
+  for (int i = 0; i < password.length; i++) {
+    if (password[i].toLowerCase() == password[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool validateSignUp(email, password, confirmPassword) {
+  return validateEmail(email: email) &&
+      ((password != null || password.trim().isNotEmpty) &&
+          (password.contains(RegExp(r'[A-Z]'))) &&
+          (password.contains(RegExp(r'[a-z]'))) &&
+          (password.contains(RegExp(r'[0-9]'))) &&
+          (password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) &&
+          (!password.contains(RegExp(r'\s'))) &&
+          (password.length >= 8)) &&
+      (confirmPassword == password);
+}
+
+String? validatePassword(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Please enter your password';
+  }
+  if (!value.contains(RegExp(r'[A-Z]'))) {
+    return 'Password must contain at least one uppercase letter';
+  }
+  if (!value.contains(RegExp(r'[a-z]'))) {
+    return 'Password must contain at least one lowercase letter';
+  }
+
+  if (!value.contains(RegExp(r'[0-9]'))) {
+    return 'Password must contain at least one number';
+  }
+
+  if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+    return 'Password must contain at least one special character';
+  }
+
+  if (value.contains(RegExp(r'\s'))) {
+    return 'Password must not contain whitespace';
+  }
+  if (value.length < 8) {
+    return 'Your Password must contain at least 8 characters';
+  }
+  return null;
 }
 
 bool validateEmail({required String email}) {
-  return ((email.contains('@') &&
-          email.contains('.') &&
-          (email.substring(email.length - 1) != '.' &&
-              email.substring(email.length - 1) != '@'))) ||
-      email.isEmpty;
+  return email.contains('@') &&
+      email.contains('.') &&
+      !email.contains(' ') &&
+      (email.substring(email.length - 1) != '.' &&
+          email.substring(email.length - 1) != '@');
 }
 
-class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+class AuthFunctions {
+  final AuthService _authService = AuthService.firebase();
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-
-  Future<void> signInWithGoogle(BuildContext context) async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-      if (googleUser == null) {
-        // The user canceled Google Sign-In
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      // Sign-in with Google using Firebase
-      await _auth.signInWithCredential(credential);
-
-      // Sign-in with Google successful, show a success SnackBar
-
-      final snackBar = MySnackBar(
-        'Signed in Successfully as ${googleUser.email}!',
-      ).build();
-      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-          .showSnackBar(snackBar);
-      BaseNavigator.pushNamedAndclear(HomePage.routeName);
-    } on FirebaseAuthException catch (e) {
-      // Sign-in with Google failed, show an error SnackBar
-
-      final snackBar = MySnackBar(
-        'Error signing in with Google: $e',
-      ).build();
-      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-          .showSnackBar(snackBar);
-
-      print('Error signing in with Google: $e');
-    }
+  Future<void> signInWithGoogle() async {
+    final user = await _authService.signInWithGoogle();
+    final snackBar =
+        MySnackBar('Signed in Successfully as ${user.email}').build();
+    ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+        .showSnackBar(snackBar);
+    BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
   }
 
   Future<void> signUpWithEmailAndPassword(
       String email, String password, String confirmPassword) async {
     final userPassword = password;
-    final userConfirmPassword = confirmPassword;
     final userEmail = email;
 
-    try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
-          email: userEmail, password: userPassword);
-      User? user = userCredential.user;
-      final snackBarSuccessful = MySnackBar('Sign-up successful').build();
-      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-          .showSnackBar(snackBarSuccessful);
-      await user?.sendEmailVerification();
-      // await Future.delayed(const Duration(seconds: 3));
-      final snackBarVerify = MySnackBar(
-              'Please verify your email to continue. A link has been sent to your email address!')
-          .build();
-      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-          .showSnackBar(snackBarVerify);
-      BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        final snackBar =
-            MySnackBar('Error signing up: Email already in use').build();
+    if (validateSignUp(email, password, confirmPassword)) {
+      try {
+        await _authService.createUser(
+          email: userEmail,
+          password: userPassword,
+        );
+        final snackBarSuccessful = MySnackBar('Sign-up successful').build();
         ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBar);
-      } else if (e.code == 'weak-password') {
-        final snackBar =
-            MySnackBar('Error signing up: Enter a stronger password').build();
-        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBar);
-      } else if (userPassword != userConfirmPassword) {
-        throw Exception(e);
-      }
-    }
-  }
+            .showSnackBar(snackBarSuccessful);
+        _authService.sendEmailVerification();
 
-  Future<void> signInWithEmailAndPassword(
-      BuildContext context, String email, String password) async {
-    try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      User? user = userCredential.user;
-      if (user?.emailVerified ?? false) {
-        final snackBar = MySnackBar(
-          'Signed successfully as ${user?.email}!',
-        ).build();
+        final snackBarVerify = MySnackBar(
+                'Please verify your email to continue. A link has been sent to your email address!')
+            .build();
         ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBar);
-        BaseNavigator.pushNamedAndReplace(HomePage.routeName);
-      } else {
-        final snackBar = MySnackBar(
-          'Please verify your email to continue. A link has been sent to your email address!',
-        ).build();
+            .showSnackBar(snackBarVerify);
+        BaseNavigator.pushNamedAndClear(LoginPage.routeName);
+      } on EmailAlreadyInUseAuthException {
+        final snackBarVerify =
+            MySnackBar('Error Signing Up: Email already in use').build();
+        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+            .showSnackBar(snackBarVerify);
+      } on WeakPasswordAuthException {
+        final snackBarVerify =
+            MySnackBar('Error Signing Up: Enter a stronger password').build();
+        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+            .showSnackBar(snackBarVerify);
+      } on InvalidEmailAuthException {
+        final snackBarVerify =
+            MySnackBar('Error Signing Up: Enter a valid email').build();
+        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+            .showSnackBar(snackBarVerify);
+      } on GenericAuthException {
+        final snackBar = MySnackBar('Oops! Something went wrong').build();
         ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
             .showSnackBar(snackBar);
       }
-    } catch (e) {
-      final snackBar = MySnackBar(
-        'Error signing in: ${e.toString().substring(42)}',
-      ).build();
+    } else {
+      final snackBar = MySnackBar('Please fill in the required fields').build();
       ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
           .showSnackBar(snackBar);
-      print('Error signing in: $e');
     }
   }
 
-  Future<void> signOutUser(BuildContext context) async {
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    if (validateEmail(email: email)) {
+      if (password.isNotEmpty) {
+        try {
+          await _authService.login(email: email, password: password);
+          final user = _authService.currentUser;
+
+          if (user?.isEmailVerified ?? false) {
+            final snackBar = MySnackBar('Logged in successfully as ').build();
+            ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+                .showSnackBar(snackBar);
+            BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
+          }
+        } on UserNotFoundAuthException {
+          final snackBar =
+              MySnackBar('Error Signing In: User not found').build();
+          ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+              .showSnackBar(snackBar);
+        } on WrongPasswordAuthException {
+          final snackBar =
+              MySnackBar('Error Signing In: Incorrect Password').build();
+          ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+              .showSnackBar(snackBar);
+        } on GenericAuthException {
+          final snackBar = MySnackBar('Oops! Something went wrong').build();
+          ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+              .showSnackBar(snackBar);
+        }
+      } else {
+        final snackBar = MySnackBar('Please enter your password').build();
+        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+            .showSnackBar(snackBar);
+      }
+    }
+  }
+
+  Future<void> signOutUser() async {
     try {
-      await FirebaseAuth.instance.signOut();
+      await _authService.logout();
       final snackBar = MySnackBar(
         'Logged out Successfully!',
       ).build();
-      ScaffoldMessenger.of(RootNavigatorKey.navigatorKey.currentContext!)
+      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
           .showSnackBar(snackBar);
       BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
-    } catch (e) {
-      print("Error signing out: $e");
+    } on UserNotLoggedInAuthException {
+      final snackBar =
+          MySnackBar('Error Signing out: Failed sign out attempt').build();
+      await showMySnackBar(snackBar);
+    } on GenericAuthException catch (e) {
+      String message = e.toString();
+      final snackBar = MySnackBar(message).build();
+      await showMySnackBar(snackBar);
     }
   }
 }

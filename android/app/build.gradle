@@ -23,6 +23,8 @@ if (flutterVersionName == null) {
 }
 
 android {
+    buildToolsVersion "34.0.0"
+    
     namespace "com.example.my_notes"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion

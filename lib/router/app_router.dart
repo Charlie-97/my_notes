@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_notes/pages/home_page.dart';
-import 'package:my_notes/pages/login_page.dart';
-import 'package:my_notes/pages/signup_page.dart';
-import 'package:my_notes/pages/splash_screen.dart';
+import 'package:my_notes/presentation/pages/my_notes.dart';
+import 'package:my_notes/presentation/pages/login_page.dart';
+import 'package:my_notes/presentation/pages/signup_page.dart';
+import 'package:my_notes/presentation/pages/splash_screen.dart';
 
 class AppRouter {
   /// A custom screen navigation handler that handles the animation of moving from one screen to another
@@ -46,8 +46,8 @@ class AppRouter {
       case SplashScreen.routeName:
         return _getPageRoute(const SplashScreen());
 
-      case HomePage.routeName:
-        return _getPageRoute(const HomePage());
+      case MyNotesPage.routeName:
+        return _getPageRoute(const MyNotesPage());
       case LoginPage.routeName:
         return _getPageRoute(const LoginPage());
       case SignupPage.routeName:

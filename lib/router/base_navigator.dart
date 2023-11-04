@@ -30,7 +30,7 @@ abstract class BaseNavigator {
   }
 
   ///Push named and remove until replacement navigation
-  static Future<dynamic> pushNamedAndclear(String route, {args}) {
+  static Future<dynamic> pushNamedAndClear(String route, {args}) {
     return key.currentState!.pushNamedAndRemoveUntil(
       route,
       (_) => false,
