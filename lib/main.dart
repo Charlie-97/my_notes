@@ -31,9 +31,9 @@ class _MyNotesAppState extends State<MyNotesApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: BaseNavigator.key,
-      title: 'Flutter Demo',
+      title: 'My Notes',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor:Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
         textTheme: const TextTheme(),
         textButtonTheme: const TextButtonThemeData(

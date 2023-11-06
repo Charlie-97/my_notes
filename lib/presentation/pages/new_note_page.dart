@@ -5,6 +5,12 @@ class NewNotes extends StatelessWidget {
   static const routeName = 'new_notes';
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Create New Note'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: Container(),
+    );
   }
 }
