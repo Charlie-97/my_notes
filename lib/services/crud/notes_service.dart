@@ -194,7 +194,7 @@ class NoteService {
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       noteTable,
-      where: 'id: ?',
+      where: 'id = ?',
       whereArgs: [id],
     );
     if (deletedCount == 0) {
@@ -336,7 +336,7 @@ const idColumn = 'id';
 const emailColumn = 'email';
 const userIdColumn = 'user_id';
 const nameColumn = 'name';
-const titleColumn = 'text';
+const titleColumn = 'title';
 const bodyColumn = 'body';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 

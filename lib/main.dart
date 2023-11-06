@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:my_notes/presentation/pages/splash_screen.dart';
 import 'package:my_notes/router/app_router.dart';
@@ -35,7 +36,24 @@ class _MyNotesAppState extends State<MyNotesApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
-        textTheme: const TextTheme(),
+        textTheme: TextTheme(
+          titleLarge: GoogleFonts.montserrat(
+            fontSize: 30,
+            color: Colors.black,
+          ),
+          titleMedium: GoogleFonts.montserrat(
+            fontSize: 26,
+            color: Colors.black,
+          ),
+          bodyMedium: GoogleFonts.roboto(
+            fontSize: 20,
+            color: Colors.black,
+          ),
+          bodyLarge: GoogleFonts.montserrat(
+            fontSize: 20,
+            color: Colors.black,
+          ),
+        ),
         textButtonTheme: const TextButtonThemeData(
           style: ButtonStyle(),
         ),

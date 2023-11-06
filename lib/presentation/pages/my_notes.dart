@@ -121,7 +121,6 @@ class _MyNotesPageState extends State<MyNotesPage> {
                               builder: (context, snapshot) {
                                 switch (snapshot.connectionState) {
                                   case ConnectionState.waiting:
-                                    return const Text('Waiting...');
                                   case ConnectionState.active:
                                     return Center(
                                       child: Column(
