@@ -51,6 +51,8 @@ class _NewNotesState extends State<NewNotes> {
     _noteService = NoteService();
     _bodyController = TextEditingController();
     _titleController = TextEditingController();
+    final user = AuthService.firebase().currentUser!;
+    print(user.email);
     super.initState();
   }
 

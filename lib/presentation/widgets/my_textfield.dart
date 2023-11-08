@@ -18,6 +18,8 @@ class MyTextField extends StatelessWidget {
       controller: textController,
       maxLines: null,
       minLines: hint == '[Title]' ? 1 : 50,
+      keyboardType:
+          hint == '[Title]' ? TextInputType.text : TextInputType.multiline,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: hintStyle,

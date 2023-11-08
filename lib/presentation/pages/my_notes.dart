@@ -28,16 +28,19 @@ class _MyNotesPageState extends State<MyNotesPage> {
   final title = 'Title';
   final body = 'body';
 
-  @override
-  void initState() {
-    _noteService = NoteService();
-    super.initState();
+  void getDbUser() async {
+    final dbUser = await _noteService.getUser(
+        email: AuthService.firebase().currentUser!.email!);
+    print(dbUser);
   }
 
   @override
-  void dispose() {
-    _noteService.close();
-    super.dispose();
+  void initState() {
+    _noteService = NoteService();
+    final user = AuthService.firebase().currentUser!;
+    print(user.email);
+    getDbUser();
+    super.initState();
   }
 
   @override
@@ -122,25 +125,19 @@ class _MyNotesPageState extends State<MyNotesPage> {
                                 switch (snapshot.connectionState) {
                                   case ConnectionState.waiting:
                                   case ConnectionState.active:
-                                    return Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          const Text(
-                                            'Notes will be displayed here.',
-                                          ),
-                                          Consumer<MyNotesState>(
-                                            builder: (_, homeState, __) => Text(
-                                              'You have ${homeState.counter} notes. Tap Add Notes to create new',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
+                                    if (snapshot.hasData) {
+                                      List<DatabaseNote> notesList =
+                                          snapshot.data as List<DatabaseNote>;
+                                      return ListView.builder(
+                                        itemCount: notesList.length,
+                                        itemBuilder: (context, index) {
+                                          // print(notesList);
+                                          return Text('Notes Gotten');
+                                        },
+                                      );
+                                    } else {
+                                      return Text('No notes yet');
+                                    }
 
                                   default:
                                     return const CircularProgressIndicator();

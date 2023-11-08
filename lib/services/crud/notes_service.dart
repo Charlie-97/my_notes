@@ -7,7 +7,13 @@ import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 
 class NoteService {
-  NoteService.sharedInstances();
+  NoteService.sharedInstances() {
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_notes);
+      },
+    );
+  }
   static final NoteService _shared = NoteService.sharedInstances();
 
   factory NoteService() => _shared;
@@ -15,8 +21,7 @@ class NoteService {
   Database? _db;
 
   List<DatabaseNote> _notes = [];
-  final _notesStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
 
@@ -319,7 +324,7 @@ class DatabaseNote {
 
   @override
   String toString() {
-    return 'Note, ID = $id, userId = $userId, isSyncedWithCloud = $isSyncedWithCloud';
+    return 'Note, ID = $id, userId = $userId, Title = $title, Body = $body, isSyncedWithCloud = $isSyncedWithCloud';
   }
 
   @override
