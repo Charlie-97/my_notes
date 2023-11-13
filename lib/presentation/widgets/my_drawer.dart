@@ -17,18 +17,20 @@ class MyDrawer extends StatelessWidget {
     return Drawer(
       child: Column(
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(),
+          DrawerHeader(
+            decoration: const BoxDecoration(),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 50.0,
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 12.0,
                 ),
-                Text('Username')
+                Expanded(
+                    child: Text(
+                        _authService.currentUser!.email!.split('@').first)),
               ],
             ),
           ),

@@ -1,10 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_notes/router/base_navigator.dart';
 
 class AppOverlays {
-  User? user = FirebaseAuth.instance.currentUser;
-
+ 
   Future<bool> showLogOutDialog(BuildContext context) {
     return showDialog(
       context: context,
@@ -30,6 +28,33 @@ class AppOverlays {
       },
     ).then((value) => value ?? false);
   }
+}
+
+Future<bool> showDeleteDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: ((context) {
+      return myAlertDialog(
+        title: const Text('Delete Note?'),
+        content: const Text(
+            'Deleted notes cannot be recovered. Do you wish to continue?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              BaseNavigator.pop(false);
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              BaseNavigator.pop(true);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      );
+    }),
+  ).then((value) => value ?? false);
 }
 
 AlertDialog myAlertDialog({

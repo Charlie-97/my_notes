@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/services/crud/notes_service.dart';
 
 class MyNotesState extends ChangeNotifier {
-  int _counter = 0;
   bool loading = false;
-  int get counter => _counter;
 
   List<Widget> notesList = [];
 
-  void updateCounter() {
-    _counter++;
+  List<DatabaseNote> favorites = [];
+  bool isFavourite = false;
+
+  bool toggleFavourite() {
+    isFavourite = !isFavourite;
     notifyListeners();
+    return isFavourite;
   }
 
   void startLoader() {

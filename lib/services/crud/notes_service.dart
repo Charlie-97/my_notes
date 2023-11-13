@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' show join;
@@ -47,11 +48,14 @@ class NoteService {
     }
   }
 
-  Future<void> _cacheNotes() async {
-    final allNotes = await getAllNotes();
-    _notes = allNotes.toList();
-    _notesStreamController.add(_notes);
-  }
+  // Future<void> _cacheNotes() async {
+  //   final dbUser =
+  //       await getUser(email: AuthService.firebase().currentUser!.email!);
+
+  //   final allNotes = await getAllNotes(loggedInUserId: dbUser.id);
+  //   _notes = allNotes.toList();
+  //   _notesStreamController.add(_notes);
+  // }
 
   Database _getDatabaseOrThrow() {
     final db = _db;
@@ -75,7 +79,7 @@ class NoteService {
       await db.execute(createUserTable);
       await db.execute(createNoteTable);
 
-      await _cacheNotes();
+      // await _cacheNotes();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
     }
@@ -230,7 +234,7 @@ class NoteService {
       whereArgs: [id],
     );
     if (notes.isEmpty) {
-      throw CoulNotFindNote();
+      throw CouldNotFindNote();
     } else {
       final note = DatabaseNote.fromRow(notes.first);
       _notes.removeWhere((element) => element.id == id);
@@ -240,17 +244,46 @@ class NoteService {
     }
   }
 
-  Future<Iterable<DatabaseNote>> getAllNotes() async {
+  Future<List<DatabaseNote>> displayUserNotes(DatabaseNote note) async {
+    List<DatabaseNote> userNotes = _notes;
+    final dbUser =
+        await getUser(email: AuthService.firebase().currentUser!.email!);
+
+    userNotes.removeWhere((element) {
+      if (note.userId != dbUser.id) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    print("user Notes $userNotes");
+    return userNotes;
+  }
+
+  Future<List<DatabaseNote>> getAllNotes(
+      {required int loggedInUserId}) async {
     await ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    final notes = await db.query(noteTable);
-    return notes.map((noteRow) => DatabaseNote.fromRow(notes.first));
+    final dbUser =
+        await getUser(email: AuthService.firebase().currentUser!.email!);
+    if (loggedInUserId == dbUser.id) {
+      final notes = await db.query(
+        noteTable,
+        where: 'user_id = ?',
+        whereArgs: [loggedInUserId],
+      );
+
+      final userNotes = notes.map((noteRow) => DatabaseNote.fromRow(noteRow)).toList();
+      return userNotes;
+    } else {
+      throw UserNotesNotFound();
+    }
   }
 
   Future<DatabaseNote> updateNotes({
     required DatabaseNote note,
     String? title,
-    required String body,
+    String? body,
   }) async {
     await ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
@@ -314,7 +347,7 @@ class DatabaseNote {
     required this.isSyncedWithCloud,
   });
 
-  DatabaseNote.fromRow(Map<String, Object?> map)
+  DatabaseNote.fromRow(Map<String?, Object?> map)
       : id = map[idColumn] as int,
         userId = map[userIdColumn] as int,
         title = map[titleColumn] as String,

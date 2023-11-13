@@ -31,7 +31,7 @@ class _NewNotesState extends State<NewNotes> {
 
   void _deleteNoteIfTextIsEmpty() {
     final note = _note;
-    if ((_titleController.text.isEmpty || _bodyController.text.isEmpty) &&
+    if ((_titleController.text.isEmpty && _bodyController.text.isEmpty) &&
         note != null) {
       _noteService.deleteNote(id: note.id);
     }
@@ -70,8 +70,8 @@ class _NewNotesState extends State<NewNotes> {
     if (note == null) {
       return;
     }
-    final title = _titleController.text;
-    final body = _bodyController.text;
+    final title = _titleController.text.trim();
+    final body = _bodyController.text.trim();
     await _noteService.updateNotes(note: note, body: body, title: title);
   }
 
