@@ -107,7 +107,6 @@ class _MyNotesPageState extends State<MyNotesPage> {
                           if (snapshot.hasData) {
                             List<DatabaseNote> notesList =
                                 snapshot.data as List<DatabaseNote>;
-                            print(notesList);
                             return NotesListView(
                               notes: notesList,
                               onTap: (note) {
@@ -124,7 +123,7 @@ class _MyNotesPageState extends State<MyNotesPage> {
                               },
                             );
                           } else {
-                            return Text('No notes yet');
+                            return const Text('No notes yet');
                           }
 
                         default:

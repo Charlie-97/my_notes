@@ -64,8 +64,6 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     _noteService = NoteService();
     _bodyController = TextEditingController();
     _titleController = TextEditingController();
-    final user = AuthService.firebase().currentUser!;
-    print(user.email);
     super.initState();
   }
 

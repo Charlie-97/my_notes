@@ -253,7 +253,6 @@ class NoteService {
         return false;
       }
     });
-    print("user Notes $userNotes");
     return userNotes;
   }
 
