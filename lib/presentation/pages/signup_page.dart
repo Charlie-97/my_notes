@@ -14,6 +14,8 @@ class SignupPage extends StatefulWidget {
   State<SignupPage> createState() => _SignupPageState();
 }
 
+// late final String name;
+
 class _SignupPageState extends State<SignupPage> {
   late final TextEditingController _userEmail;
 
@@ -269,6 +271,7 @@ class _SignupPageState extends State<SignupPage> {
 
                         final AuthFunctions auth = AuthFunctions();
 
+                        // name = _userName.text;
                         await auth.signUpWithEmailAndPassword(
                             userEmail, userPassword, confirmPassword);
                         setState(() {

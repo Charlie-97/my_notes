@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:my_notes/presentation/pages/my_notes.dart';
 import 'package:my_notes/presentation/pages/login_page.dart';
-import 'package:my_notes/presentation/pages/new_note_page.dart';
+import 'package:my_notes/presentation/pages/create_update_note_view.dart';
 import 'package:my_notes/presentation/pages/signup_page.dart';
 import 'package:my_notes/presentation/pages/splash_screen.dart';
 
 class AppRouter {
-  /// A custom screen navigation handler that handles the animation of moving from one screen to another
+  /// A custom screen navigation handler that handles the animation of moving from one screen to another.
   /// The current setting sets up the app to mimic the navigation on IOS devices on every of our app variant
   ///
   static _getPageRoute(
@@ -52,8 +52,14 @@ class AppRouter {
         return _getPageRoute(const LoginPage());
       case SignupPage.routeName:
         return _getPageRoute(const SignupPage());
-      case NewNotes.routeName:
-        return _getPageRoute(const NewNotes());
+      case CreateUpdateNoteView.routeName:
+        final s = settings.arguments as Map<String, dynamic>;
+        return _getPageRoute(
+          CreateUpdateNoteView(
+            pageTitle: s['pageTitle'],
+            note: s['note'],
+          ),
+        );
 
       default:
         return _getPageRoute(const SplashScreen());

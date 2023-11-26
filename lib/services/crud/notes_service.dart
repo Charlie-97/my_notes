@@ -40,7 +40,7 @@ class NoteService {
     try {
       final user = await getUser(email: email);
       return user;
-    } on CouldNotFindUSer {
+    } on CouldNotFindUser {
       final newUser = await createUser(email: email, name: (name ?? ''));
       return newUser;
     } catch (e) {
@@ -48,14 +48,11 @@ class NoteService {
     }
   }
 
-  // Future<void> _cacheNotes() async {
-  //   final dbUser =
-  //       await getUser(email: AuthService.firebase().currentUser!.email!);
-
-  //   final allNotes = await getAllNotes(loggedInUserId: dbUser.id);
-  //   _notes = allNotes.toList();
-  //   _notesStreamController.add(_notes);
-  // }
+  Future<void> _cacheNotes() async {
+    final allNotes = await getAllNotes();
+    _notes = allNotes.toList();
+    _notesStreamController.add(_notes);
+  }
 
   Database _getDatabaseOrThrow() {
     final db = _db;
@@ -79,7 +76,7 @@ class NoteService {
       await db.execute(createUserTable);
       await db.execute(createNoteTable);
 
-      // await _cacheNotes();
+      await _cacheNotes();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
     }
@@ -139,7 +136,7 @@ class NoteService {
       whereArgs: [email.toLowerCase()],
     );
     if (results.isEmpty) {
-      throw CouldNotFindUSer();
+      throw CouldNotFindUser();
     } else {
       return DatabaseUser.fromRow(results.first);
     }
@@ -173,11 +170,11 @@ class NoteService {
     final dbUser = await getUser(email: owner.email);
 
     if (dbUser != owner) {
-      throw CouldNotFindUSer();
+      throw CouldNotFindUser();
     }
 
-    const title = 'title';
-    const body = 'body';
+    const title = '';
+    const body = '';
     final noteId = await db.insert(noteTable, {
       userIdColumn: owner.id,
       titleColumn: title,
@@ -237,7 +234,7 @@ class NoteService {
       throw CouldNotFindNote();
     } else {
       final note = DatabaseNote.fromRow(notes.first);
-      _notes.removeWhere((element) => element.id == id);
+      _notes.removeWhere((note) => note.id == id);
       _notes.add(note);
       _notesStreamController.add(_notes);
       return note;
@@ -260,24 +257,15 @@ class NoteService {
     return userNotes;
   }
 
-  Future<List<DatabaseNote>> getAllNotes(
-      {required int loggedInUserId}) async {
+  Future<List<DatabaseNote>> getAllNotes() async {
     await ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    final dbUser =
-        await getUser(email: AuthService.firebase().currentUser!.email!);
-    if (loggedInUserId == dbUser.id) {
-      final notes = await db.query(
-        noteTable,
-        where: 'user_id = ?',
-        whereArgs: [loggedInUserId],
-      );
 
-      final userNotes = notes.map((noteRow) => DatabaseNote.fromRow(noteRow)).toList();
-      return userNotes;
-    } else {
-      throw UserNotesNotFound();
-    }
+    final notes = await db.query(noteTable);
+
+    final userNotes =
+        notes.map((noteRow) => DatabaseNote.fromRow(noteRow)).toList();
+    return userNotes;
   }
 
   Future<DatabaseNote> updateNotes({
@@ -300,7 +288,7 @@ class NoteService {
       throw CouldNotUpdateNote();
     } else {
       final updatedNote = await getNote(id: note.id);
-      _notes.removeWhere((element) => element.id == updatedNote.id);
+      _notes.removeWhere((note) => note.id == updatedNote.id);
       _notes.add(updatedNote);
       _notesStreamController.add(_notes);
 
@@ -369,7 +357,7 @@ class DatabaseNote {
 
 const dbName = 'notes.db';
 const noteTable = 'notes';
-const userTable = 'User';
+const userTable = 'user';
 const idColumn = 'id';
 const emailColumn = 'email';
 const userIdColumn = 'user_id';
@@ -378,7 +366,7 @@ const titleColumn = 'title';
 const bodyColumn = 'body';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 
-const createUserTable = ''' CREATE TABLE IF NOT EXISTS "User" (
+const createUserTable = ''' CREATE TABLE IF NOT EXISTS "user" (
 	"id"	INTEGER NOT NULL,
 	"email"	TEXT NOT NULL UNIQUE,
   "name" TEXT NOT NULL,

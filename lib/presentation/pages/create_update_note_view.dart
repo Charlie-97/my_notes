@@ -3,22 +3,33 @@ import 'package:my_notes/presentation/widgets/my_textfield.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/services/crud/notes_service.dart';
 
-class NewNotes extends StatefulWidget {
-  const NewNotes({super.key});
+class CreateUpdateNoteView extends StatefulWidget {
+  final String pageTitle;
+  final DatabaseNote? note;
+  const CreateUpdateNoteView({super.key, required this.pageTitle, this.note});
   static const routeName = 'new_notes';
 
   @override
-  State<NewNotes> createState() => _NewNotesState();
+  State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
 }
 
-class _NewNotesState extends State<NewNotes> {
+class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   DatabaseNote? _note;
   late final NoteService _noteService;
 
   late final TextEditingController _titleController;
   late final TextEditingController _bodyController;
 
-  Future<DatabaseNote> createNewNote() async {
+  Future<DatabaseNote> createOrGetExistingNote() async {
+    final widgetNote = widget.note;
+
+    if (widgetNote != null) {
+      _note = widgetNote;
+      _titleController.text = widgetNote.title;
+      _bodyController.text = widgetNote.body;
+      return widgetNote;
+    }
+
     final existingNote = _note;
     if (existingNote != null) {
       return existingNote;
@@ -26,7 +37,9 @@ class _NewNotesState extends State<NewNotes> {
     final currentUser = AuthService.firebase().currentUser!;
     final email = currentUser.email!;
     final owner = await _noteService.getUser(email: email);
-    return await _noteService.createNote(owner: owner);
+    final newNote = await _noteService.createNote(owner: owner);
+    _note = newNote;
+    return newNote;
   }
 
   void _deleteNoteIfTextIsEmpty() {
@@ -87,17 +100,16 @@ class _NewNotesState extends State<NewNotes> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Create New Note',
+          widget.pageTitle,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: FutureBuilder(
-        future: createNewNote(),
+        future: createOrGetExistingNote(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              _note = snapshot.data as DatabaseNote;
               _setupTextControllerListener();
               return Padding(
                 padding:

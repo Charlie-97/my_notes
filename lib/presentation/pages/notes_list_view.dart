@@ -4,21 +4,22 @@ import 'package:my_notes/services/crud/notes_service.dart';
 import 'package:my_notes/utils/home_state.dart';
 import 'package:provider/provider.dart';
 
-typedef DeleteNoteCallBack = void Function(DatabaseNote note);
+typedef NoteCallBack = void Function(DatabaseNote note);
 
 class NotesListView extends StatelessWidget {
   const NotesListView({
     super.key,
     required this.notes,
     required this.onDeleteNote,
+    required this.onTap,
   });
 
   final List<DatabaseNote> notes;
-  final DeleteNoteCallBack onDeleteNote;
+  final NoteCallBack onDeleteNote;
+  final NoteCallBack onTap;
 
   @override
   Widget build(BuildContext context) {
-    final notesState = Provider.of<MyNotesState>(context, listen: false);
     return ChangeNotifierProvider(
       create: (BuildContext context) => MyNotesState(),
       child: ListView.builder(
@@ -27,7 +28,11 @@ class NotesListView extends StatelessWidget {
           final displayedNoteList = notes.reversed;
           final note = displayedNoteList.toList()[index];
           return ListTile(
+            onTap: () {
+              onTap(note);
+            },
             shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
                 side: BorderSide(
                     style: BorderStyle.solid,
                     color: Theme.of(context).colorScheme.inversePrimary)),
@@ -43,41 +48,17 @@ class NotesListView extends StatelessWidget {
               softWrap: true,
               overflow: TextOverflow.ellipsis,
             ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: Consumer<MyNotesState>(
-                    builder: (BuildContext context, value, Widget? child) {
-                      return IconButton(
-                        onPressed: () {
-                          notesState.toggleFavourite();
-                        },
-                        icon: Icon(
-                          notesState.isFavourite
-                              ? Icons.favorite
-                              : Icons.favorite_outline,
-                          color: Theme.of(context).colorScheme.inversePrimary,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: IconButton(
-                    onPressed: () async {
-                      final shouldDelete = await showDeleteDialog(context);
-                      if (shouldDelete) {
-                        onDeleteNote(note);
-                      }
-                    },
-                    icon: Icon(
-                      Icons.delete_outline,
-                      color: Theme.of(context).colorScheme.inversePrimary,
-                    ),
-                  ),
-                ),
-              ],
+            trailing: IconButton(
+              onPressed: () async {
+                final shouldDelete = await showDeleteDialog(context);
+                if (shouldDelete) {
+                  onDeleteNote(note);
+                }
+              },
+              icon: Icon(
+                Icons.delete_outline,
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
             ),
           );
         },
