@@ -94,42 +94,46 @@ class _MyNotesPageState extends State<MyNotesPage> {
             label: const Text('Add Note'),
           ),
           body: FutureBuilder(
-            future: _noteService.getOrCreateUser(email: authUser.email!),
+            future: _noteService.getOrCreateUser(
+                email: authUser.email!, name: authUser.email!.split('@')[0]),
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
-                  return StreamBuilder(
-                    stream: _noteService.allNotes,
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.waiting:
-                        case ConnectionState.active:
-                          if (snapshot.hasData) {
-                            List<DatabaseNote> notesList =
-                                snapshot.data as List<DatabaseNote>;
-                            return NotesListView(
-                              notes: notesList,
-                              onTap: (note) {
-                                BaseNavigator.pushNamed(
-                                  CreateUpdateNoteView.routeName,
-                                  args: {
-                                    'pageTitle': 'Update Note',
-                                    'note': note,
-                                  },
-                                );
-                              },
-                              onDeleteNote: (note) async {
-                                await _noteService.deleteNote(id: note.id);
-                              },
-                            );
-                          } else {
-                            return const Text('No notes yet');
-                          }
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                    child: StreamBuilder(
+                      stream: _noteService.allNotes,
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                          case ConnectionState.active:
+                            if (snapshot.hasData) {
+                              List<DatabaseNote> notesList =
+                                  snapshot.data as List<DatabaseNote>;
+                              return NotesListView(
+                                notes: notesList,
+                                onTap: (note) {
+                                  BaseNavigator.pushNamed(
+                                    CreateUpdateNoteView.routeName,
+                                    args: {
+                                      'pageTitle': 'Update Note',
+                                      'note': note,
+                                    },
+                                  );
+                                },
+                                onDeleteNote: (note) async {
+                                  await _noteService.deleteNote(id: note.id);
+                                },
+                              );
+                            } else {
+                              return const Text('No notes yet');
+                            }
 
-                        default:
-                          return const CircularProgressIndicator();
-                      }
-                    },
+                          default:
+                            return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
                   );
                 default:
                   return const CircularProgressIndicator();
