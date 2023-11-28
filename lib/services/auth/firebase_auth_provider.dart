@@ -114,7 +114,7 @@ class FirebaseAuthProvider implements AuthProvider {
           await FirebaseAuth.instance.signInWithCredential(credential);
 
       final AuthUser authUser =
-          AuthUser(isEmailVerified: true, email: userCredential.user!.email);
+          AuthUser(isEmailVerified: true, email: userCredential.user!.email!, id: userCredential.user!.uid);
       return authUser;
     } catch (_) {
       throw GenericAuthException();

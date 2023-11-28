@@ -95,7 +95,7 @@ class _MyNotesPageState extends State<MyNotesPage> {
           ),
           body: FutureBuilder(
             future: _noteService.getOrCreateUser(
-                email: authUser.email!, name: authUser.email!.split('@')[0]),
+                email: authUser.email, name: authUser.email.split('@')[0]),
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:

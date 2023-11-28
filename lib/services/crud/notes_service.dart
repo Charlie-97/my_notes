@@ -9,14 +9,14 @@ import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 
 class NoteService {
-  NoteService.sharedInstances() {
+  NoteService._sharedInstances() {
     _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
       onListen: () {
         _notesStreamController.sink.add(_notes);
       },
     );
   }
-  static final NoteService _shared = NoteService.sharedInstances();
+  static final NoteService _shared = NoteService._sharedInstances();
 
   factory NoteService() => _shared;
 
@@ -267,7 +267,7 @@ class NoteService {
   Future<List<DatabaseNote>> displayUserNotes(DatabaseNote note) async {
     List<DatabaseNote> userNotes = _notes;
     final dbUser =
-        await getUser(email: AuthService.firebase().currentUser!.email!);
+        await getUser(email: AuthService.firebase().currentUser!.email);
 
     userNotes.removeWhere((element) {
       if (note.userId != dbUser.id) {

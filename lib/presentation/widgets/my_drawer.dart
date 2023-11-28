@@ -30,7 +30,7 @@ class MyDrawer extends StatelessWidget {
                 ),
                 Expanded(
                     child: Text(
-                        _authService.currentUser!.email!.split('@').first)),
+                        _authService.currentUser!.email.split('@').first)),
               ],
             ),
           ),
