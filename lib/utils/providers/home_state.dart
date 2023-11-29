@@ -1,19 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:my_notes/services/crud/notes_service.dart';
 
 class MyNotesState extends ChangeNotifier {
   bool loading = false;
 
   List<Widget> notesList = [];
-
-  List<DatabaseNote> favorites = [];
-  bool isFavourite = false;
-
-  bool toggleFavourite() {
-    isFavourite = !isFavourite;
-    notifyListeners();
-    return isFavourite;
-  }
 
   void startLoader() {
     loading = true;
@@ -29,6 +19,18 @@ class MyNotesState extends ChangeNotifier {
     startLoader();
     await Future.delayed(const Duration(seconds: 3));
     startLoader();
+    notifyListeners();
+  }
+
+  bool isReversed = true;
+  void reverseOrder() {
+    isReversed = !isReversed;
+    notifyListeners();
+  }
+
+  bool isLongPressed = false;
+  void longPressed() {
+    isLongPressed = true;
     notifyListeners();
   }
 }

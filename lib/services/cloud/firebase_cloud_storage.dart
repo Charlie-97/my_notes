@@ -6,12 +6,17 @@ import 'package:my_notes/services/cloud/cloud_storage_exceptions.dart';
 class FirebaseCloudStorage {
   final notes = FirebaseFirestore.instance.collection('notes');
 
-  void createNewNote({required String ownerUserId}) async {
-    await notes.add(<String, dynamic>{
+  Future<CloudNote> createNewNote({required String ownerUserId}) async {
+    final document = await notes.add(<String, dynamic>{
       ownerUserIdFieldName: ownerUserId,
       titleFieldName: '',
       bodyFieldName: '',
     });
+
+    final fetchedNote = await document.get();
+
+    return CloudNote(
+        docId: fetchedNote.id, ownerUserId: ownerUserId, title: '', body: '');
   }
 
   Future<Iterable<CloudNote>> getNotes({ownerUserId}) async {
@@ -22,14 +27,11 @@ class FirebaseCloudStorage {
             isEqualTo: ownerUserId,
           )
           .get()
-          .then((value) => value.docs.map((doc) {
-                return CloudNote(
-                  docId: doc.id,
-                  ownerUserId: doc.data()[ownerUserIdFieldName] as String,
-                  title: doc.data()[titleFieldName] as String,
-                  body: doc.data()[bodyFieldName] as String,
-                );
-              }));
+          .then(
+            (value) => value.docs.map(
+              (doc) => CloudNote.fromSnapshot(doc),
+            ),
+          );
     } catch (e) {
       throw CouldNotGetAllNotesException();
     }

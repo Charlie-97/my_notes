@@ -1,12 +1,11 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:my_notes/presentation/pages/login_page.dart';
-import 'package:my_notes/presentation/pages/my_notes.dart';
-import 'package:my_notes/router/base_navigator.dart';
+import 'package:my_notes/presentation/pages/authentication/login_page.dart';
+import 'package:my_notes/presentation/pages/notes/my_notes.dart';
+import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/presentation/widgets/snackbar_messages.dart';
-import 'package:my_notes/services/crud/notes_service.dart';
 
 Function setPasswordVisibility({required bool obscureText}) {
   return () {
@@ -106,11 +105,8 @@ bool validateEmail({required String email}) {
 class AuthFunctions {
   final AuthService _authService = AuthService.firebase();
 
-  final _noteService = NoteService();
-
   Future<void> signInWithGoogle() async {
     final user = await _authService.signInWithGoogle();
-    await _noteService.getOrCreateUser(email: '${user.email}', name: '');
     final snackBar =
         MySnackBar('Signed in Successfully as ${user.email}').build();
     ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
@@ -133,8 +129,6 @@ class AuthFunctions {
         ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
             .showSnackBar(snackBarSuccessful);
         _authService.sendEmailVerification();
-
-        await _noteService.createUser(email: email, name: '');
 
         final snackBarVerify = MySnackBar(
                 'Please verify your email to continue. A link has been sent to your email address!')
@@ -178,8 +172,6 @@ class AuthFunctions {
 
           if (user?.isEmailVerified ?? true) {
             final snackBar = MySnackBar('Logged in successfully as ').build();
-
-            await _noteService.getOrCreateUser(email: email);
 
             ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
                 .showSnackBar(snackBar);

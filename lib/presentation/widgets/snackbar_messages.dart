@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_notes/router/base_navigator.dart';
+import 'package:my_notes/utils/router/base_navigator.dart';
 
 class MySnackBar {
   final String message;

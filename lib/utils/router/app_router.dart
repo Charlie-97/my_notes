@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_notes/presentation/pages/my_notes.dart';
-import 'package:my_notes/presentation/pages/login_page.dart';
-import 'package:my_notes/presentation/pages/create_update_note_view.dart';
-import 'package:my_notes/presentation/pages/signup_page.dart';
+import 'package:my_notes/presentation/pages/notes/my_notes.dart';
+import 'package:my_notes/presentation/pages/authentication/login_page.dart';
+import 'package:my_notes/presentation/pages/notes/create_update_note_view.dart';
+import 'package:my_notes/presentation/pages/authentication/signup_page.dart';
 import 'package:my_notes/presentation/pages/splash_screen.dart';
 
 class AppRouter {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_notes/presentation/pages/login_page.dart';
-import 'package:my_notes/router/base_navigator.dart';
+import 'package:my_notes/presentation/pages/authentication/login_page.dart';
+import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/presentation/widgets/dialogue_boxes.dart';
 import 'package:my_notes/presentation/widgets/snackbar_messages.dart';

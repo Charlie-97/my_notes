@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_notes/presentation/pages/signup_page.dart';
-import 'package:my_notes/router/base_navigator.dart';
+import 'package:my_notes/presentation/pages/authentication/signup_page.dart';
+import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/utils/functions.dart';
 import 'package:my_notes/presentation/widgets/google_button.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';

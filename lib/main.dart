@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:my_notes/presentation/pages/splash_screen.dart';
-import 'package:my_notes/router/app_router.dart';
-import 'package:my_notes/router/base_navigator.dart';
+import 'package:my_notes/utils/router/app_router.dart';
+import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
-import 'package:my_notes/utils/home_state.dart';
+import 'package:my_notes/utils/providers/home_state.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
