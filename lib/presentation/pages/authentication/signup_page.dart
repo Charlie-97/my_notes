@@ -271,9 +271,13 @@ class _SignupPageState extends State<SignupPage> {
 
                         final AuthFunctions auth = AuthFunctions();
 
-                        // name = _userName.text;
+                        final name = _userName.text;
                         await auth.signUpWithEmailAndPassword(
-                            userEmail, userPassword, confirmPassword);
+                          name: name,
+                          email: userEmail,
+                          password: userPassword,
+                          confirmPassword: confirmPassword,
+                        );
                         setState(() {
                           _loading = false;
                         });

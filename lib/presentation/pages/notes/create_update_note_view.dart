@@ -3,6 +3,7 @@ import 'package:my_notes/presentation/widgets/my_textfield.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/services/cloud/cloud_note.dart';
 import 'package:my_notes/services/cloud/firebase_cloud_storage.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
   final String pageTitle;
@@ -103,6 +104,25 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () {
+              if (_titleController.text.isNotEmpty ||
+                  _bodyController.text.isNotEmpty) {
+                final title = _titleController.text.isNotEmpty
+                    ? _titleController.text
+                    : '[UNTITLED]';
+                final body = _bodyController.text.isNotEmpty
+                    ? _bodyController.text
+                    : '[EMPTY NOTES]';
+
+                final text = '$title\n$body';
+                Share.share(text);
+              }
+            },
+          ),
+        ],
       ),
       body: FutureBuilder(
         future: createOrGetExistingNote(),

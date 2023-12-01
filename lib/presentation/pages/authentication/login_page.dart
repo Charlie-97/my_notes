@@ -172,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                             final auth = AuthFunctions();
 
                             await auth.signInWithEmailAndPassword(
-                                email, password);
+                                context, email, password);
 
                             setState(() {
                               _loading = false;

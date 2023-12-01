@@ -11,7 +11,7 @@ class GoogleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: () async {
-        _auth.signInWithGoogle();
+        _auth.signInWithGoogle(context);
       },
       icon: const Icon(FontAwesomeIcons.google),
       label: const Text('Continue with Google'),

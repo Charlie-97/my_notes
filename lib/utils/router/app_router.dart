@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/presentation/pages/home_page.dart';
 import 'package:my_notes/presentation/pages/notes/my_notes.dart';
 import 'package:my_notes/presentation/pages/authentication/login_page.dart';
 import 'package:my_notes/presentation/pages/notes/create_update_note_view.dart';
@@ -46,6 +47,8 @@ class AppRouter {
     switch (settings.name) {
       case SplashScreen.routeName:
         return _getPageRoute(const SplashScreen());
+      case HomePage.routeName:
+        return _getPageRoute(const HomePage());
       case MyNotesPage.routeName:
         return _getPageRoute(const MyNotesPage());
       case LoginPage.routeName:

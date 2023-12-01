@@ -36,16 +36,16 @@ class _MyNotesPageState extends State<MyNotesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final homeState = Provider.of<MyNotesState>(context, listen: false);
+    // final homeState = Provider.of<MyNotesState>(context, listen: false);
     final authUser = _authService.currentUser!;
 
     List<Widget> defaultActions = [
-      IconButton(
-        onPressed: () {
-          homeState.reverseOrder();
-        },
-        icon: const Icon(Icons.sort),
-      ),
+      // IconButton(
+      //   onPressed: () {
+      //     homeState.reverseOrder();
+      //   },
+      //   icon: const Icon(Icons.sort),
+      // ),
       PopupMenuButton<MenuAction>(
         onSelected: (value) async {
           switch (value) {
@@ -55,11 +55,11 @@ class _MyNotesPageState extends State<MyNotesPage> {
                   .showLogOutDialog(BaseNavigator.key.currentContext!);
 
               if (shouldLogout) {
-                await auth.signOutUser();
+                auth.signOutUser(context);
               }
               break;
             case MenuAction.refresh:
-              homeState.refresh();
+              // homeState.refresh();
               // setState(() {});
               break;
             default:
@@ -91,7 +91,8 @@ class _MyNotesPageState extends State<MyNotesPage> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             actions:
-                homeState.isLongPressed ? longPressedActions : defaultActions,
+                // homeState.isLongPressed ? longPressedActions :
+                defaultActions,
           ),
           drawer: MyDrawer(),
           floatingActionButton: FloatingActionButton.extended(
@@ -143,7 +144,8 @@ class _MyNotesPageState extends State<MyNotesPage> {
           ),
         ),
         Visibility(
-          visible: homeState.loading,
+          visible: false,
+          // visible: homeState.loading,
           child: Center(
             child: Opacity(
               opacity: 0.5,
@@ -160,7 +162,8 @@ class _MyNotesPageState extends State<MyNotesPage> {
           ),
         ),
         Visibility(
-          visible: homeState.loading,
+          visible: false,
+          // visible: homeState.loading,
           child: SpinKitFoldingCube(
             color: Theme.of(context).colorScheme.primary,
             size: 100,

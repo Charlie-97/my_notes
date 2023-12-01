@@ -1,5 +1,7 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_notes/presentation/pages/home_page.dart';
 import 'package:my_notes/presentation/pages/notes/my_notes.dart';
 import 'package:my_notes/presentation/pages/authentication/login_page.dart';
 import 'package:my_notes/utils/router/base_navigator.dart';
@@ -25,31 +27,33 @@ class _SplashScreenState extends State<SplashScreen> {
   initCheck() async {
     await Future.delayed(const Duration(seconds: 5));
 
-    // final User? user = FirebaseAuth.instance.currentUser;
+    BaseNavigator.pushNamedAndClear(HomePage.routeName);
 
-    final AuthService authService = AuthService.firebase();
-    final user = authService.currentUser;
+    // // final User? user = FirebaseAuth.instance.currentUser;
 
-    Future<bool> isUserLoggedIn() async {
-      // final user = FirebaseAuth.instance.currentUser;
-      final user = authService.currentUser;
-      return user != null;
-    }
+    // final AuthService authService = AuthService.firebase();
+    // final user = authService.currentUser;
 
-    if (await isUserLoggedIn()) {
-      if (user?.isEmailVerified ?? false) {
-        final snackBar = MySnackBar(
-          'Signed in Successfully as ${user?.email}!',
-        ).build();
-        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBar);
-        BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
-      } else {
-        BaseNavigator.pushNamedAndClear(LoginPage.routeName);
-      }
-    } else {
-      BaseNavigator.pushNamedAndClear(LoginPage.routeName);
-    }
+    // Future<bool> isUserLoggedIn() async {
+    //   // final user = FirebaseAuth.instance.currentUser;
+    //   final user = authService.currentUser;
+    //   return user != null;
+    // }
+
+    // if (await isUserLoggedIn()) {
+    //   if (user?.isEmailVerified ?? false) {
+    //     final snackBar = MySnackBar(
+    //       'Signed in Successfully as ${user?.email}!',
+    //     ).build();
+    //     ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+    //         .showSnackBar(snackBar);
+    //     BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
+    //   } else {
+    //     BaseNavigator.pushNamedAndClear(LoginPage.routeName);
+    //   }
+    // } else {
+    //   BaseNavigator.pushNamedAndClear(LoginPage.routeName);
+    // }
   }
 
   @override

@@ -1,11 +1,15 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_notes/presentation/pages/authentication/login_page.dart';
 import 'package:my_notes/presentation/pages/notes/my_notes.dart';
+import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
+import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/presentation/widgets/snackbar_messages.dart';
+import 'package:path/path.dart';
 
 Function setPasswordVisibility({required bool obscureText}) {
   return () {
@@ -105,17 +109,26 @@ bool validateEmail({required String email}) {
 class AuthFunctions {
   final AuthService _authService = AuthService.firebase();
 
-  Future<void> signInWithGoogle() async {
-    final user = await _authService.signInWithGoogle();
-    final snackBar =
-        MySnackBar('Signed in Successfully as ${user.email}').build();
-    ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-        .showSnackBar(snackBar);
-    BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      context.read<AuthBloc>().add(const AuthEventGoogleLogin());
+    } catch (e) {
+      //null
+    }
+
+    // final user = await _authService.signInWithGoogle();
+    // final snackBar =
+    //     MySnackBar('Signed in Successfully as ${user.email}').build();
+    // ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+    //     .showSnackBar(snackBar);
+    // BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
   }
 
   Future<void> signUpWithEmailAndPassword(
-      String email, String password, String confirmPassword) async {
+      {required String name,
+      required String email,
+      required String password,
+      required String confirmPassword}) async {
     final userPassword = password;
     final userEmail = email;
 
@@ -125,6 +138,7 @@ class AuthFunctions {
           email: userEmail,
           password: userPassword,
         );
+        await _authService.updateDisplayName(displayName: name);
         final snackBarSuccessful = MySnackBar('Sign-up successful').build();
         ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
             .showSnackBar(snackBarSuccessful);
@@ -163,20 +177,22 @@ class AuthFunctions {
     }
   }
 
-  Future<void> signInWithEmailAndPassword(String email, String password) async {
+  Future<void> signInWithEmailAndPassword(
+      BuildContext context, String email, String password) async {
     if (validateEmail(email: email)) {
       if (password.isNotEmpty) {
         try {
-          await _authService.login(email: email, password: password);
-          final user = _authService.currentUser;
+          context.read<AuthBloc>().add(AuthEventLogin(email, password));
+          // await _authService.login(email: email, password: password);
+          // final user = _authService.currentUser;
 
-          if (user?.isEmailVerified ?? true) {
-            final snackBar = MySnackBar('Logged in successfully as ').build();
+          // if (user?.isEmailVerified ?? true) {
+          //   final snackBar = MySnackBar('Logged in successfully as ').build();
 
-            ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-                .showSnackBar(snackBar);
-            BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
-          }
+          //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+          //       .showSnackBar(snackBar);
+          //   BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
+          // }
         } on UserNotFoundAuthException {
           final snackBar =
               MySnackBar('Error Signing In: User not found').build();
@@ -200,15 +216,16 @@ class AuthFunctions {
     }
   }
 
-  Future<void> signOutUser() async {
+  void signOutUser(BuildContext context) async {
     try {
-      await _authService.logout();
-      final snackBar = MySnackBar(
-        'Logged out Successfully!',
-      ).build();
-      ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-          .showSnackBar(snackBar);
-      BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
+      context.read<AuthBloc>().add(const AuthEventLogout());
+      // await _authService.logout();
+      // final snackBar = MySnackBar(
+      //   'Logged out Successfully!',
+      // ).build();
+      // ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+      //     .showSnackBar(snackBar);
+      // BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
     } on UserNotLoggedInAuthException {
       final snackBar =
           MySnackBar('Error Signing out: Failed sign out attempt').build();

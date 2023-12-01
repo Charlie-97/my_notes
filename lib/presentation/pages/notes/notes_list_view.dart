@@ -20,15 +20,15 @@ class NotesListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final homeState = Provider.of<MyNotesState>(context);
+    // final homeState = Provider.of<MyNotesState>(context);
     return ChangeNotifierProvider(
       create: (BuildContext context) => MyNotesState(),
       child: ListView.builder(
         itemCount: notes.length,
         itemBuilder: (context, index) {
-          final displayedNoteList =
-              homeState.isReversed ? notes.toList().reversed : notes.toList();
-          final note = displayedNoteList.toList()[index];
+          // final displayedNoteList =
+          //     homeState.isReversed ? notes.toList().reversed : notes.toList();
+          final note = notes.toList()[index];
           return Card(
             elevation: 3.0,
             child: ListTile(

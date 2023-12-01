@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_notes/presentation/pages/authentication/login_page.dart';
+import 'package:my_notes/utils/functions.dart';
 import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/presentation/widgets/dialogue_boxes.dart';
@@ -29,8 +30,11 @@ class MyDrawer extends StatelessWidget {
                   width: 12.0,
                 ),
                 Expanded(
-                    child: Text(
-                        _authService.currentUser!.email.split('@').first)),
+                  child: Text(
+                    // _authService.currentUser!.email.split('@').first,
+                    _authService.currentUser!.displayName!,
+                  ),
+                ),
               ],
             ),
           ),
@@ -61,16 +65,12 @@ class MyDrawer extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: TextButton.icon(
               onPressed: () async {
+                final auth = AuthFunctions();
                 final shouldLogout =
                     await _appOverlays.showLogOutDialog(context);
                 devtools.log(shouldLogout.toString());
                 if (shouldLogout) {
-                  await _authService.logout();
-                  BaseNavigator.pushNamedAndClear(LoginPage.routeName);
-                  final snackbar = MySnackBar('Sign out successful').build();
-                  ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-                      .showSnackBar(snackbar);
-                  BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
+                  auth.signOutUser(context);
                 }
               },
               icon: const Icon(Icons.logout),

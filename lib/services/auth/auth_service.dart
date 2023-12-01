@@ -30,6 +30,9 @@ class AuthService implements AuthProvider {
   Future<void> initialize() => provider.initialize();
 
   @override
-  Future<AuthUser> signInWithGoogle() =>
-      provider.signInWithGoogle();
+  Future<AuthUser> signInWithGoogle() => provider.signInWithGoogle();
+
+  @override
+  Future<void> updateDisplayName({required String displayName}) =>
+      provider.updateDisplayName(displayName: displayName);
 }
