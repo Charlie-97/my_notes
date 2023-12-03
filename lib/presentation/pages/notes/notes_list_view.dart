@@ -42,7 +42,7 @@ class NotesListView extends StatelessWidget {
                       color: Theme.of(context).colorScheme.inversePrimary)),
               title: Text(
                 note.title.isNotEmpty ? note.title : '[Title]',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
                 maxLines: 1,
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,

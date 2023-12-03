@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_notes/presentation/widgets/my_textfield.dart';
+import 'package:my_notes/presentation/widgets/snackbar_messages.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/services/cloud/cloud_note.dart';
 import 'package:my_notes/services/cloud/firebase_cloud_storage.dart';
@@ -21,6 +22,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
 
   late final TextEditingController _titleController;
   late final TextEditingController _bodyController;
+
+  final _titleFocus = FocusNode();
+  final _bodyFocus = FocusNode();
 
   Future<CloudNote> createOrGetExistingNote() async {
     final widgetNote = widget.note;
@@ -66,6 +70,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     _noteService = FirebaseCloudStorage();
     _bodyController = TextEditingController();
     _titleController = TextEditingController();
+    _titleFocus.requestFocus();
     super.initState();
   }
 
@@ -119,6 +124,10 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
 
                 final text = '$title\n$body';
                 Share.share(text);
+              } else if (_bodyController.text.isEmpty &&
+                  _bodyController.text.isEmpty) {
+                final snackBar = MySnackBar('Cannot share empty note').build();
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
               }
             },
           ),
@@ -136,6 +145,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                 child: Column(
                   children: [
                     MyTextField(
+                      focusNode: _titleFocus,
+                      nextField: _bodyFocus,
                       hint: '[Title]',
                       hintStyle: Theme.of(context).textTheme.titleMedium,
                       textController: _titleController,
@@ -147,6 +158,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                     ),
                     Expanded(
                       child: MyTextField(
+                        focusNode: _bodyFocus,
                         hint: '[Enter your note here...]',
                         hintStyle: Theme.of(context).textTheme.bodyMedium,
                         textController: _bodyController,

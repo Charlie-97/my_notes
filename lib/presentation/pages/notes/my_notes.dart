@@ -10,7 +10,6 @@ import 'package:my_notes/utils/functions.dart';
 import 'package:my_notes/utils/providers/home_state.dart';
 import 'package:my_notes/presentation/widgets/my_drawer.dart';
 import 'package:my_notes/presentation/widgets/dialogue_boxes.dart';
-import 'package:provider/provider.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 
 class MyNotesPage extends StatefulWidget {
@@ -80,7 +79,7 @@ class _MyNotesPageState extends State<MyNotesPage> {
       ),
     ];
 
-    List<Widget> longPressedActions = [];
+    // List<Widget> longPressedActions = [];
     return Stack(
       children: [
         Scaffold(

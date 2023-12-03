@@ -1,12 +1,7 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_notes/presentation/pages/home_page.dart';
-import 'package:my_notes/presentation/pages/notes/my_notes.dart';
-import 'package:my_notes/presentation/pages/authentication/login_page.dart';
 import 'package:my_notes/utils/router/base_navigator.dart';
-import 'package:my_notes/services/auth/auth_service.dart';
-import 'package:my_notes/presentation/widgets/snackbar_messages.dart';
 import 'package:animate_do/animate_do.dart';
 
 class SplashScreen extends StatefulWidget {

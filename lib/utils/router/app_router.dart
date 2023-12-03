@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/presentation/pages/authentication/email_verification_page.dart';
 import 'package:my_notes/presentation/pages/home_page.dart';
 import 'package:my_notes/presentation/pages/notes/my_notes.dart';
 import 'package:my_notes/presentation/pages/authentication/login_page.dart';
@@ -55,6 +56,8 @@ class AppRouter {
         return _getPageRoute(const LoginPage());
       case SignupPage.routeName:
         return _getPageRoute(const SignupPage());
+      case VerifyEmailPage.routeName:
+        return _getPageRoute(const VerifyEmailPage());
       case CreateUpdateNoteView.routeName:
         final s = settings.arguments as Map<String, dynamic>;
         return _getPageRoute(

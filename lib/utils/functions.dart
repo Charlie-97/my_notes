@@ -1,15 +1,10 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_notes/presentation/pages/authentication/login_page.dart';
-import 'package:my_notes/presentation/pages/notes/my_notes.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/utils/router/base_navigator.dart';
-import 'package:my_notes/services/auth/auth_exceptions.dart';
-import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/presentation/widgets/snackbar_messages.dart';
-import 'package:path/path.dart';
 
 Function setPasswordVisibility({required bool obscureText}) {
   return () {
@@ -107,14 +102,13 @@ bool validateEmail({required String email}) {
 }
 
 class AuthFunctions {
-  final AuthService _authService = AuthService.firebase();
-
   Future<void> signInWithGoogle(BuildContext context) async {
-    try {
-      context.read<AuthBloc>().add(const AuthEventGoogleLogin());
-    } catch (e) {
-      //null
-    }
+    context.read<AuthBloc>().add(const AuthEventGoogleLogin());
+    // try {
+
+    // } catch (e) {
+    //   //null
+    // }
 
     // final user = await _authService.signInWithGoogle();
     // final snackBar =
@@ -125,51 +119,51 @@ class AuthFunctions {
   }
 
   Future<void> signUpWithEmailAndPassword(
-      {required String name,
+      {required BuildContext context,
+      required String name,
       required String email,
       required String password,
       required String confirmPassword}) async {
-    final userPassword = password;
-    final userEmail = email;
-
     if (validateSignUp(email, password, confirmPassword)) {
-      try {
-        await _authService.createUser(
-          email: userEmail,
-          password: userPassword,
-        );
-        await _authService.updateDisplayName(displayName: name);
-        final snackBarSuccessful = MySnackBar('Sign-up successful').build();
-        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBarSuccessful);
-        _authService.sendEmailVerification();
+      context.read<AuthBloc>().add(AuthEventRegister(name, email, password));
+      // context.read<AuthBloc>().add(const AuthEventSendEmailVerification());
+      // try {
+      //   await _authService.createUser(
+      //     email: email,
+      //     password: password,
+      //   );
+      //   await _authService.updateDisplayName(displayName: name);
+      //   final snackBarSuccessful = MySnackBar('Sign-up successful').build();
+      //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+      //       .showSnackBar(snackBarSuccessful);
+      //   _authService.sendEmailVerification();
 
-        final snackBarVerify = MySnackBar(
-                'Please verify your email to continue. A link has been sent to your email address!')
-            .build();
-        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBarVerify);
-        BaseNavigator.pushNamedAndClear(LoginPage.routeName);
-      } on EmailAlreadyInUseAuthException {
-        final snackBarVerify =
-            MySnackBar('Error Signing Up: Email already in use').build();
-        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBarVerify);
-      } on WeakPasswordAuthException {
-        final snackBarVerify =
-            MySnackBar('Error Signing Up: Enter a stronger password').build();
-        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBarVerify);
-      } on InvalidEmailAuthException {
-        final snackBarVerify =
-            MySnackBar('Error Signing Up: Enter a valid email').build();
-        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBarVerify);
-      } on GenericAuthException {
-        final snackBar = MySnackBar('Oops! Something went wrong').build();
-        ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-            .showSnackBar(snackBar);
-      }
+      //   final snackBarVerify = MySnackBar(
+      //           'Please verify your email to continue. A link has been sent to your email address!')
+      //       .build();
+      //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+      //       .showSnackBar(snackBarVerify);
+      //   BaseNavigator.pushNamedAndClear(LoginPage.routeName);
+      // } on EmailAlreadyInUseAuthException {
+      //   final snackBarVerify =
+      //       MySnackBar('Error Signing Up: Email already in use').build();
+      //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+      //       .showSnackBar(snackBarVerify);
+      // } on WeakPasswordAuthException {
+      //   final snackBarVerify =
+      //       MySnackBar('Error Signing Up: Enter a stronger password').build();
+      //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+      //       .showSnackBar(snackBarVerify);
+      // } on InvalidEmailAuthException {
+      //   final snackBarVerify =
+      //       MySnackBar('Error Signing Up: Enter a valid email').build();
+      //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+      //       .showSnackBar(snackBarVerify);
+      // } on GenericAuthException {
+      //   final snackBar = MySnackBar('Oops! Something went wrong').build();
+      //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+      //       .showSnackBar(snackBar);
+      // }
     } else {
       final snackBar = MySnackBar('Please fill in the required fields').build();
       ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
@@ -181,33 +175,34 @@ class AuthFunctions {
       BuildContext context, String email, String password) async {
     if (validateEmail(email: email)) {
       if (password.isNotEmpty) {
-        try {
-          context.read<AuthBloc>().add(AuthEventLogin(email, password));
-          // await _authService.login(email: email, password: password);
-          // final user = _authService.currentUser;
+        context.read<AuthBloc>().add(AuthEventLogin(email, password));
+        // try {
 
-          // if (user?.isEmailVerified ?? true) {
-          //   final snackBar = MySnackBar('Logged in successfully as ').build();
+        // await _authService.login(email: email, password: password);
+        // final user = _authService.currentUser;
 
-          //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-          //       .showSnackBar(snackBar);
-          //   BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
-          // }
-        } on UserNotFoundAuthException {
-          final snackBar =
-              MySnackBar('Error Signing In: User not found').build();
-          ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-              .showSnackBar(snackBar);
-        } on WrongPasswordAuthException {
-          final snackBar =
-              MySnackBar('Error Signing In: Incorrect Password').build();
-          ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-              .showSnackBar(snackBar);
-        } on GenericAuthException {
-          final snackBar = MySnackBar('Oops! Something went wrong').build();
-          ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-              .showSnackBar(snackBar);
-        }
+        // if (user?.isEmailVerified ?? true) {
+        // final snackBar = MySnackBar('Logged in successfully as ').build();
+
+        // ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+        //     .showSnackBar(snackBar);
+        // BaseNavigator.pushNamedAndClear(MyNotesPage.routeName);
+        // }
+        // } on UserNotFoundAuthException {
+        //   final snackBar =
+        //       MySnackBar('Error Signing In: User not found').build();
+        //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+        //       .showSnackBar(snackBar);
+        // } on WrongPasswordAuthException {
+        //   final snackBar =
+        //       MySnackBar('Error Signing In: Incorrect Password').build();
+        //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+        //       .showSnackBar(snackBar);
+        // } on GenericAuthException {
+        //   final snackBar = MySnackBar('Oops! Something went wrong').build();
+        //   ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+        //       .showSnackBar(snackBar);
+        // }
       } else {
         final snackBar = MySnackBar('Please enter your password').build();
         ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
@@ -216,24 +211,25 @@ class AuthFunctions {
     }
   }
 
-  void signOutUser(BuildContext context) async {
-    try {
-      context.read<AuthBloc>().add(const AuthEventLogout());
-      // await _authService.logout();
-      // final snackBar = MySnackBar(
-      //   'Logged out Successfully!',
-      // ).build();
-      // ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-      //     .showSnackBar(snackBar);
-      // BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
-    } on UserNotLoggedInAuthException {
-      final snackBar =
-          MySnackBar('Error Signing out: Failed sign out attempt').build();
-      await showMySnackBar(snackBar);
-    } on GenericAuthException catch (e) {
-      String message = e.toString();
-      final snackBar = MySnackBar(message).build();
-      await showMySnackBar(snackBar);
-    }
+  void signOutUser(BuildContext context) {
+    context.read<AuthBloc>().add(const AuthEventLogout());
+    // try {
+
+    //   // await _authService.logout();
+    //   // final snackBar = MySnackBar(
+    //   //   'Logged out Successfully!',
+    //   // ).build();
+    //   // ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
+    //   //     .showSnackBar(snackBar);
+    //   // BaseNavigator.pushNamedAndReplace(LoginPage.routeName);
+    // } on UserNotLoggedInAuthException {
+    //   final snackBar =
+    //       MySnackBar('Error Signing out: Failed sign out attempt').build();
+    //   await showMySnackBar(snackBar);
+    // } on GenericAuthException catch (e) {
+    //   String message = e.toString();
+    //   final snackBar = MySnackBar(message).build();
+    //   await showMySnackBar(snackBar);
+    // }
   }
 }
