@@ -39,3 +39,7 @@ class AuthEventRegister extends AuthEvent {
 class AuthEventShouldRegister extends AuthEvent {
   const AuthEventShouldRegister();
 }
+
+class RefreshEvent extends AuthEvent {
+  const RefreshEvent();
+}

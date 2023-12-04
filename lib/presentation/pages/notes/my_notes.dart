@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_notes/enums/menu_action.dart';
 import 'package:my_notes/presentation/pages/notes/create_update_note_view.dart';
 import 'package:my_notes/presentation/pages/notes/notes_list_view.dart';
+import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
+import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/services/cloud/cloud_note.dart';
 import 'package:my_notes/services/cloud/firebase_cloud_storage.dart';
@@ -58,8 +60,8 @@ class _MyNotesPageState extends State<MyNotesPage> {
               }
               break;
             case MenuAction.refresh:
-              // homeState.refresh();
-              // setState(() {});
+              context.read<AuthBloc>().add(const RefreshEvent());
+
               break;
             default:
           }
@@ -80,95 +82,66 @@ class _MyNotesPageState extends State<MyNotesPage> {
     ];
 
     // List<Widget> longPressedActions = [];
-    return Stack(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: Text(
-              'My Notes',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            actions:
-                // homeState.isLongPressed ? longPressedActions :
-                defaultActions,
-          ),
-          drawer: MyDrawer(),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              BaseNavigator.pushNamed(
-                CreateUpdateNoteView.routeName,
-                args: {'pageTitle': 'Create New Note'},
-              );
-            },
-            tooltip: 'Create New Note',
-            icon: const Icon(Icons.add),
-            label: const Text('Add Note'),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.fromLTRB(6.0, 6.0, 6.0, 3.0),
-            child: StreamBuilder(
-              stream: _noteService.allNotes(ownerUserId: authUser.id),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                  case ConnectionState.active:
-                    if (snapshot.hasData) {
-                      Iterable<CloudNote> notesList =
-                          snapshot.data as Iterable<CloudNote>;
-                      return NotesListView(
-                        notes: notesList,
-                        onTap: (note) {
-                          BaseNavigator.pushNamed(
-                            CreateUpdateNoteView.routeName,
-                            args: {
-                              'pageTitle': 'Update Note',
-                              'note': note,
-                            },
-                          );
-                        },
-                        onDeleteNote: (note) async {
-                          await _noteService.deleteNotes(docId: note.docId);
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(
+          'My Notes',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        actions:
+            // homeState.isLongPressed ? longPressedActions :
+            defaultActions,
+      ),
+      drawer: MyDrawer(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          BaseNavigator.pushNamed(
+            CreateUpdateNoteView.routeName,
+            args: {'pageTitle': 'Create New Note'},
+          );
+        },
+        tooltip: 'Create New Note',
+        icon: const Icon(Icons.add),
+        label: const Text('Add Note'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(6.0, 6.0, 6.0, 3.0),
+        child: StreamBuilder(
+          stream: _noteService.allNotes(ownerUserId: authUser.id),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                if (snapshot.hasData) {
+                  Iterable<CloudNote> notesIterable =
+                      snapshot.data as Iterable<CloudNote>;
+                  final List<CloudNote> notesList = notesIterable.toList();
+                  return NotesListView(
+                    notes: notesList,
+                    onTap: (note) {
+                      BaseNavigator.pushNamed(
+                        CreateUpdateNoteView.routeName,
+                        args: {
+                          'pageTitle': 'Update Note',
+                          'note': note,
                         },
                       );
-                    } else {
-                      return const Text('No notes yet');
-                    }
-
-                  default:
-                    return const CircularProgressIndicator();
+                    },
+                    onDeleteNote: (note) async {
+                      await _noteService.deleteNotes(docId: note.docId);
+                    },
+                  );
+                } else {
+                  return const Text('No notes yet');
                 }
-              },
-            ),
-          ),
+
+              default:
+                return const CircularProgressIndicator();
+            }
+          },
         ),
-        Visibility(
-          visible: false,
-          // visible: homeState.loading,
-          child: Center(
-            child: Opacity(
-              opacity: 0.5,
-              child: Container(
-                color: Colors.deepPurple[50],
-                height: MediaQuery.sizeOf(context).height,
-                width: MediaQuery.sizeOf(context).width,
-                child: SpinKitFoldingCube(
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 100,
-                ),
-              ),
-            ),
-          ),
-        ),
-        Visibility(
-          visible: false,
-          // visible: homeState.loading,
-          child: SpinKitFoldingCube(
-            color: Theme.of(context).colorScheme.primary,
-            size: 100,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

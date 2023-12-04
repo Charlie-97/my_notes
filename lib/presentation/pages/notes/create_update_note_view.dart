@@ -137,6 +137,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         future: createOrGetExistingNote(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
             case ConnectionState.done:
               _setupTextControllerListener();
               return Padding(
