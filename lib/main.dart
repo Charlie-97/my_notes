@@ -59,8 +59,11 @@ class _MyNotesAppState extends State<MyNotesApp> {
             color: Colors.black,
           ),
         ),
-        textButtonTheme: const TextButtonThemeData(
-          style: ButtonStyle(),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.purple[50],
+          ),
         ),
       ),
       onGenerateRoute: AppRouter.onGenerateRoute,

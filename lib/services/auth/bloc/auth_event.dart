@@ -43,3 +43,8 @@ class AuthEventShouldRegister extends AuthEvent {
 class RefreshEvent extends AuthEvent {
   const RefreshEvent();
 }
+
+class AuthEventResetPassword extends AuthEvent {
+  final String email;
+  const AuthEventResetPassword(this.email);
+}

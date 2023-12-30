@@ -12,16 +12,23 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userName = _authService.currentUser!.displayName!;
+
+    final firstLetter = userName.substring(0, 1);
+
     return Drawer(
       child: Column(
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const CircleAvatar(
-                  radius: 50.0,
+                CircleAvatar(
+                  radius: 36.0,
+                  child: Text(
+                    firstLetter,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(
                   width: 12.0,

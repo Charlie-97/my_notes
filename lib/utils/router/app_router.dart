@@ -4,7 +4,7 @@ import 'package:my_notes/presentation/pages/home_page.dart';
 import 'package:my_notes/presentation/pages/notes/my_notes.dart';
 import 'package:my_notes/presentation/pages/authentication/login_page.dart';
 import 'package:my_notes/presentation/pages/notes/create_update_note_view.dart';
-import 'package:my_notes/presentation/pages/authentication/signup_page.dart';
+import 'package:my_notes/presentation/pages/authentication/register_page.dart';
 import 'package:my_notes/presentation/pages/splash_screen.dart';
 
 class AppRouter {
@@ -54,8 +54,8 @@ class AppRouter {
         return _getPageRoute(const MyNotesPage());
       case LoginPage.routeName:
         return _getPageRoute(const LoginPage());
-      case SignupPage.routeName:
-        return _getPageRoute(const SignupPage());
+      case RegisterPage.routeName:
+        return _getPageRoute(const RegisterPage());
       case VerifyEmailPage.routeName:
         return _getPageRoute(const VerifyEmailPage());
       case CreateUpdateNoteView.routeName:

@@ -232,4 +232,18 @@ class AuthFunctions {
     //   await showMySnackBar(snackBar);
     // }
   }
+
+  Future<void> resetPassword(BuildContext context, String email) async {
+    if (validateEmail(email: email)) {
+      context.read<AuthBloc>().add(AuthEventResetPassword(email));
+      final snackBar =
+          MySnackBar('A password reset link has been sent to your email.')
+              .build();
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      final snackBar =
+          MySnackBar('Enter your email above and try again').build();
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
 }

@@ -42,3 +42,14 @@ class AuthStateLoggedOut extends AuthState with EquatableMixin {
 class RefreshingState extends AuthState {
   const RefreshingState(bool isLoading) : super(isLoading);
 }
+
+class AuthStateResettingPasssword extends AuthState {
+  final Exception? exception;
+  final bool hasSentEmail;
+
+  const AuthStateResettingPasssword(
+      {required this.exception,
+      required this.hasSentEmail,
+      required bool isLoading})
+      : super(isLoading);
+}

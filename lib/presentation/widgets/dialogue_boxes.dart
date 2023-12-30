@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:my_notes/utils/router/base_navigator.dart';
 
 class AppOverlays {
- 
   Future<bool> showLogOutDialog(BuildContext context) {
     return showDialog(
       context: context,
@@ -35,7 +34,7 @@ Future<bool> showDeleteDialog(BuildContext context) {
     context: context,
     builder: ((context) {
       return myAlertDialog(
-        title: const Text('Delete Note?'),
+        title: const Text('Delete Note'),
         content: const Text(
             'Deleted notes cannot be recovered. Do you wish to continue?'),
         actions: [
@@ -54,6 +53,32 @@ Future<bool> showDeleteDialog(BuildContext context) {
         ],
       );
     }),
+  ).then((value) => value ?? false);
+}
+
+Future<bool> showCloseDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return myAlertDialog(
+        title: const Text('Exit'),
+        content: const Text('Do you want to exit?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              BaseNavigator.pop(false);
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              BaseNavigator.pop(true);
+            },
+            child: const Text('Exit'),
+          ),
+        ],
+      );
+    },
   ).then((value) => value ?? false);
 }
 
