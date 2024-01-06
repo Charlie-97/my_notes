@@ -4,7 +4,6 @@ import 'package:my_notes/services/auth/auth_provider.dart';
 import 'package:my_notes/services/auth/auth_user.dart';
 import 'package:test/test.dart';
 
-
 void main() {
   group('Mock AuthProvider', () {
     final MockAuthProvider provider = MockAuthProvider();
@@ -109,7 +108,8 @@ class MockAuthProvider implements AuthProvider {
     if (password == 'foobar') throw WeakPasswordAuthException();
     const user = AuthUser(
       isEmailVerified: false,
-      email: 'foo@bar.com', id: 'my_id',
+      email: 'foo@bar.com',
+      id: 'my_id',
     );
     _user = user;
     return Future.value(user);
@@ -128,7 +128,11 @@ class MockAuthProvider implements AuthProvider {
     if (!isInitialized) throw NotInitializedException();
     final user = _user;
     if (user == null) throw UserNotFoundAuthException();
-    const newUser = AuthUser(isEmailVerified: true, email: 'foo@bar.com', id: 'my_id',);
+    const newUser = AuthUser(
+      isEmailVerified: true,
+      email: 'foo@bar.com',
+      id: 'my_id',
+    );
     _user = newUser;
   }
 
@@ -139,14 +143,19 @@ class MockAuthProvider implements AuthProvider {
     final user = await gSignIn.signIn();
     if (user == null) throw GoogleSigninCancelled();
     await Future.delayed(const Duration(seconds: 1));
-    const newUser = AuthUser(email: 'foo@bar.com', isEmailVerified: true, id: 'my_id');
+    const newUser =
+        AuthUser(email: 'foo@bar.com', isEmailVerified: true, id: 'my_id');
     _user = newUser;
     return newUser;
   }
-  
+
   @override
   Future<void> updateDisplayName({required String displayName}) {
-    // TODO: implement updateDisplayName
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> resetPassword(String email) {
     throw UnimplementedError();
   }
 }
