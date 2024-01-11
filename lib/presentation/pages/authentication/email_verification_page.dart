@@ -44,20 +44,24 @@ class VerifyEmailPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    context
-                        .read<AuthBloc>()
-                        .add(const AuthEventSendEmailVerification());
+                    context.read<AuthBloc>().add(const AuthEventLogout());
                   },
-                  child: const Text('Resend Verification Email'),
+                  child: const Text('Continue'),
                 ),
                 const SizedBox(
                   height: 16.0,
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    context.read<AuthBloc>().add(const AuthEventLogout());
+                    context.read<AuthBloc>().add(
+                          const AuthEventSendEmailVerification(),
+                        );
                   },
-                  child: const Text('Continue'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple[50],
+                    foregroundColor: Colors.deepPurple,
+                  ),
+                  child: const Text('Resend Verification Email'),
                 ),
               ],
             )

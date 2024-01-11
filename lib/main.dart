@@ -3,21 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:my_notes/presentation/pages/splash_screen.dart';
+import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/firebase_auth_provider.dart';
 import 'package:my_notes/utils/router/app_router.dart';
 import 'package:my_notes/utils/router/base_navigator.dart';
-import 'package:my_notes/services/auth/auth_service.dart';
-// import 'package:my_notes/utils/providers/home_state.dart';
-// import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await AuthService.firebase().initialize();
   runApp(
-    // ChangeNotifierProvider(create: (context) => MyNotesState(),
-    // child:const MyNotesApp(),)
     BlocProvider<AuthBloc>(
       create: (context) => AuthBloc(FirebaseAuthProvider()),
       child: const MyNotesApp(),

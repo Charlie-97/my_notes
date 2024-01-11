@@ -11,9 +11,11 @@ class ResetPassword extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.chevron_left),
+          icon: const Icon(Icons.chevron_left),
           onPressed: () {
-            context.read<AuthBloc>().add(const AuthEventShouldRegister());
+            context.read<AuthBloc>().add(
+                  const AuthEventShouldRegister(),
+                );
           },
         ),
         title: Padding(
@@ -49,17 +51,6 @@ class ResetPassword extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    context
-                        .read<AuthBloc>()
-                        .add(const AuthEventSendEmailVerification());
-                  },
-                  child: const Text('Resend Password Reset Email'),
-                ),
-                const SizedBox(
-                  height: 16.0,
-                ),
-                ElevatedButton(
-                  onPressed: () {
                     context.read<AuthBloc>().add(const AuthEventLogout());
                   },
                   child: const Text('Continue'),
@@ -69,9 +60,15 @@ class ResetPassword extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    context.read<AuthBloc>().add(const AuthEventLogout());
+                    context
+                        .read<AuthBloc>()
+                        .add(const AuthEventSendEmailVerification());
                   },
-                  child: const Text('Cancel'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple[50],
+                    foregroundColor: Colors.deepPurple,
+                  ),
+                  child: const Text('Resend Password Reset Email'),
                 ),
               ],
             )

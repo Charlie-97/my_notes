@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:my_notes/presentation/widgets/google_button.dart';
 import 'package:my_notes/presentation/widgets/snackbar_messages.dart';
 import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/services/auth/bloc/auth_state.dart';
-import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/utils/functions.dart';
-import 'package:my_notes/presentation/widgets/google_button.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
-  static const routeName = 'signup_page';
+  static const routeName = 'register_page';
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -67,6 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.sizeOf(context).width;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthStateRegistering) {
@@ -74,35 +75,34 @@ class _RegisterPageState extends State<RegisterPage> {
             final snackBar =
                 MySnackBar('Error Signing Up: Enter a stronger password')
                     .build();
-            ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-                .showSnackBar(snackBar);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           } else if (state.exception is EmailAlreadyInUseAuthException) {
             final snackBar =
                 MySnackBar('Error Signing Up: Email already in use').build();
-            ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-                .showSnackBar(snackBar);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           } else if (state.exception is InvalidEmailAuthException) {
             final snackBar =
                 MySnackBar('Error Signing Up: Enter a valid email').build();
-            ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-                .showSnackBar(snackBar);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           } else if (state.exception is GenericAuthException) {
             final snackBar = MySnackBar('Oops! Something went wrong').build();
-            ScaffoldMessenger.of(BaseNavigator.key.currentContext!)
-                .showSnackBar(snackBar);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (didPop) {
+            return;
+          }
           context.read<AuthBloc>().add(const AuthEventLogout());
-          return false;
         },
         child: Scaffold(
           backgroundColor: Theme.of(context).colorScheme.background,
           appBar: AppBar(
             title: Text(
-              'Signup',
+              'Register',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onBackground,
               ),
@@ -370,8 +370,6 @@ class _RegisterPageState extends State<RegisterPage> {
                             context
                                 .read<AuthBloc>()
                                 .add(const AuthEventLogout());
-                            // BaseNavigator.pushNamedAndClear(
-                            //     LoginPage.routeName);
                           },
                           child: Text(
                             "Login Here",

@@ -1,14 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:my_notes/presentation/widgets/dialogue_boxes.dart';
+import 'package:my_notes/presentation/widgets/google_button.dart';
 import 'package:my_notes/presentation/widgets/snackbar_messages.dart';
 import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/services/auth/bloc/auth_state.dart';
-import 'package:my_notes/utils/router/base_navigator.dart';
 import 'package:my_notes/utils/functions.dart';
-import 'package:my_notes/presentation/widgets/google_button.dart';
+import 'package:my_notes/utils/router/base_navigator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -74,10 +77,16 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
-          bool confirmClose = await showCloseDialog(context);
-          return confirmClose;
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (bool didPop) async {
+          if (didPop) {
+            return;
+          }
+          final bool shouldPop = await showCloseDialog(context);
+          if (shouldPop) {
+            exit(0);
+          }
         },
         child: Scaffold(
           appBar: AppBar(
@@ -122,6 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                     enableSuggestions: false,
                     autocorrect: false,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
                     controller: _userEmail,
                     onTapOutside: (_) {
                       FocusScope.of(context).unfocus();
@@ -156,6 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                     enableSuggestions: false,
                     autocorrect: false,
                     controller: _userPassword,
+                    textInputAction: TextInputAction.done,
                     onTapOutside: (event) {
                       FocusScope.of(context).unfocus();
                     },
@@ -271,7 +282,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // BaseNavigator.pushNamed(SignupPage.routeName);
                           context
                               .read<AuthBloc>()
                               .add(const AuthEventShouldRegister());

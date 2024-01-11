@@ -30,8 +30,9 @@ class GoogleButton extends StatelessWidget {
         icon: const Icon(FontAwesomeIcons.google),
         label: const Text('Continue with Google'),
         style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.purple[50],
-            foregroundColor: Colors.deepPurple),
+          backgroundColor: Colors.purple[50],
+          foregroundColor: Colors.deepPurple,
+        ),
       ),
     );
   }

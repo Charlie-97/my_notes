@@ -105,9 +105,12 @@ AlertDialog myAlertDialog({
       right: 24,
     ),
     shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-      topLeft: Radius.circular(50.0),
-      bottomRight: Radius.circular(50.0),
-    )),
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(30.0),
+        bottomRight: Radius.circular(30.0),
+        topRight: Radius.circular(15.0),
+        bottomLeft: Radius.circular(15.0),
+      ),
+    ),
   );
 }

@@ -16,6 +16,9 @@ class MyDrawer extends StatelessWidget {
 
     final firstLetter = userName.substring(0, 1);
 
+    final auth = AuthFunctions();
+    late final signout = auth.signOutUser(context);
+
     return Drawer(
       child: Column(
         children: [
@@ -69,12 +72,11 @@ class MyDrawer extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: TextButton.icon(
               onPressed: () async {
-                final auth = AuthFunctions();
                 final shouldLogout =
                     await _appOverlays.showLogOutDialog(context);
                 devtools.log(shouldLogout.toString());
                 if (shouldLogout) {
-                  auth.signOutUser(context);
+                  signout;
                 }
               },
               icon: const Icon(Icons.logout),
