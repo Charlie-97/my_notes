@@ -93,10 +93,9 @@ class _RegisterPageState extends State<RegisterPage> {
       child: PopScope(
         canPop: false,
         onPopInvoked: (didPop) {
-          if (didPop) {
-            return;
+          if (!didPop) {
+            context.read<AuthBloc>().add(const AuthEventLogout());
           }
-          context.read<AuthBloc>().add(const AuthEventLogout());
         },
         child: Scaffold(
           backgroundColor: Theme.of(context).colorScheme.background,

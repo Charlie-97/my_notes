@@ -42,12 +42,11 @@ class _MyNotesPageState extends State<MyNotesPage> {
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) async {
-        if (didPop) {
-          return;
-        }
-        final bool shouldPop = await showCloseDialog(context);
-        if (shouldPop) {
-          exit(0);
+        if (!didPop) {
+          final bool shouldPop = await showCloseDialog(context);
+          if (shouldPop) {
+            exit(0);
+          }
         }
       },
       child: Scaffold(
