@@ -11,12 +11,16 @@ class MySnackBar {
         .colorScheme; // Replace with your app's theme
 
     return SnackBar(
+      dismissDirection: DismissDirection.horizontal,
+      margin: const EdgeInsets.all(6),
+      behavior: SnackBarBehavior.floating,
       backgroundColor: colorScheme.primary, // Background color
       content: Center(
         child: Text(
           message,
           style: TextStyle(
-            color: colorScheme.onPrimary, // Text color
+            color: colorScheme.onPrimary,
+            fontSize: 12, // Text color
           ),
         ),
       ),

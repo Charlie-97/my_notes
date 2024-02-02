@@ -7,16 +7,25 @@ class FirebaseCloudStorage {
   final notes = FirebaseFirestore.instance.collection('notes');
 
   Future<CloudNote> createNewNote({required String ownerUserId}) async {
+    DateTime now = DateTime.now();
     final document = await notes.add(<String, dynamic>{
       ownerUserIdFieldName: ownerUserId,
       titleFieldName: '',
       bodyFieldName: '',
+      createdAtFieldName: now,
+      editedAtFieldName: now,
     });
 
     final fetchedNote = await document.get();
 
     return CloudNote(
-        docId: fetchedNote.id, ownerUserId: ownerUserId, title: '', body: '');
+        docId: fetchedNote.id,
+        ownerUserId: ownerUserId,
+        title: '',
+        body: '',
+        createdAt: now,
+        editedAt: now,
+        );
   }
 
   Future<Iterable<CloudNote>> getNotes({ownerUserId}) async {
@@ -41,11 +50,12 @@ class FirebaseCloudStorage {
     required String docId,
     required String title,
     required String body,
+    required DateTime editedAt,
   }) async {
     try {
       await notes
           .doc(docId)
-          .update({titleFieldName: title, bodyFieldName: body});
+          .update({titleFieldName: title, bodyFieldName: body, editedAtFieldName: editedAt});
     } catch (e) {
       throw CouldNotUpdateNoteException();
     }
@@ -60,7 +70,7 @@ class FirebaseCloudStorage {
   }
 
   Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) =>
-      notes.snapshots().map((event) => event.docs
+      notes.orderBy(editedAtFieldName, descending: true).snapshots().map((event) => event.docs
           .map((doc) => CloudNote.fromSnapshot(doc))
           .where((note) => note.ownerUserId == ownerUserId));
 

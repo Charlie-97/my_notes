@@ -59,9 +59,14 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final title = _titleController.text;
     final body = _bodyController.text;
     final note = _note;
+    final editedAt = DateTime.now();
     if ((title.isNotEmpty || body.isNotEmpty) && note != null) {
       await _noteService.updateNote(
-          docId: note.docId, title: title, body: body);
+        docId: note.docId,
+        title: title,
+        body: body,
+        editedAt: editedAt,
+      );
     }
   }
 
@@ -90,7 +95,13 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     }
     final title = _titleController.text.trim();
     final body = _bodyController.text.trim();
-    await _noteService.updateNote(docId: note.docId, body: body, title: title);
+    final editedAt = DateTime.now();
+    await _noteService.updateNote(
+      docId: note.docId,
+      body: body,
+      title: title,
+      editedAt: editedAt,
+    );
   }
 
   void _setupTextControllerListener() {
@@ -104,12 +115,17 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0.1,
         title: Text(
           widget.pageTitle,
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge!
+              .copyWith(letterSpacing: -1.5),
         ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.save_outlined)),
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
